@@ -19,6 +19,6 @@ public class Cargo {
     private int id;
     private double weight;
 
-    @ManyToMany(mappedBy = "products", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Orders> orders;
+    @ManyToMany(mappedBy = "cargos", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Destination> destinations;
 }

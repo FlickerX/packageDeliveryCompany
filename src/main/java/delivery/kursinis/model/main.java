@@ -13,9 +13,7 @@ public class main {
         EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("PackageDeliveryCompany");
 
         UserHib userHib = new UserHib(entityManagerFactory);
-//        Manager manager = new Manager("admin", "admin", "Nikita", "Gorcakovas",
-//            LocalDate.of(2001, Month.SEPTEMBER, 14), "+37000000000",
-//            LocalDate.of(2020, Month.SEPTEMBER, 3), null);
+
         Manager manager = new Manager("admin", "admin", "Nikita", "Gorcakovas", LocalDate.of(2001, Month.SEPTEMBER, 14), "+37000000000", 567.00, false);
         userHib.createUser(manager);
     }

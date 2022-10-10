@@ -19,7 +19,7 @@ public class Courier extends User{
     private String healthCertificate;
 
     @OneToOne
-    private Orders orders;
+    private Destination destination;
 
     public Courier(String login, String password, String name, String surname, LocalDate birthday, String phoneNo, Double salary, String driverLicense, String healthCertificate) {
         super(login, password, name, surname, birthday, phoneNo, salary);

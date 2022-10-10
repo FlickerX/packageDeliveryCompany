@@ -24,7 +24,7 @@ public class Truck {
     private String color;
 
     @OneToOne
-    private Orders orders;
+    private Destination destination;
 
     public Truck(String mark, String model, Double engineLiters, Integer horsePower, String color) {
         this.mark = mark;

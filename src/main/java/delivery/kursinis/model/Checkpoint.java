@@ -20,8 +20,9 @@ public class Checkpoint {
     private int id;
 
     private String address;
+
     private LocalDate checkpointDate;
 
     @ManyToMany (mappedBy = "checkpoints", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<Orders> orders;
+    private List<Destination> destinations;
 }

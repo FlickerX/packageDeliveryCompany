@@ -85,6 +85,8 @@ public class Main implements Initializable {
     @FXML
     public ChoiceBox trucksChoiceBox;
 
+    // Orders
+    public ListView trucksOrderList;
     private EntityManagerFactory entityManagerFactory;
     private User user;
     private UserHib userHib;
@@ -96,7 +98,6 @@ public class Main implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        trucksChoiceBox.getItems().addAll(truckHib.getAllTrucks());
         userTypeChoiceBox.getItems().addAll(checkBoxValues);
         userTypeChoiceBox.setOnAction(actionEvent -> hideFields(userTypeChoiceBox.getValue()));
     }
