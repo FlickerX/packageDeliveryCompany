@@ -80,13 +80,26 @@ public class Main implements Initializable {
     public TextField color;
     @FXML
     public ListView<Truck> truckList;
+    @FXML
+    public Tab orderManagementTab;
+    @FXML
+    public ChoiceBox trucksChoiceBox;
 
     private EntityManagerFactory entityManagerFactory;
     private User user;
     private UserHib userHib;
     private TruckHib truckHib;
     private String[] checkBoxValues = {"Courier", "Manager", "Admin Manager"};
+
+    private String[] trucksChoiceBoxValues;
     private FxUtils fxUtils = new FxUtils();
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        trucksChoiceBox.getItems().addAll(truckHib.getAllTrucks());
+        userTypeChoiceBox.getItems().addAll(checkBoxValues);
+        userTypeChoiceBox.setOnAction(actionEvent -> hideFields(userTypeChoiceBox.getValue()));
+    }
 
     public void setData(EntityManagerFactory entityManagerFactory, User user) {
         this.entityManagerFactory = entityManagerFactory;
@@ -112,12 +125,6 @@ public class Main implements Initializable {
         allTrucks.forEach(truck -> truckList.getItems().add(truck));
         allCouriers.forEach(courier -> courierList.getItems().add(courier));
         allManagers.forEach(manager -> managerList.getItems().add(manager));
-    }
-
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        userTypeChoiceBox.getItems().addAll(checkBoxValues);
-        userTypeChoiceBox.setOnAction(actionEvent -> hideFields(userTypeChoiceBox.getValue()));
     }
 
     public void createUserByAdmin() {

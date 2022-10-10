@@ -94,5 +94,21 @@
                </right>
             </BorderPane>
          </content></Tab>
+      <Tab fx:id="orderManagementTab" text="Order Management">
+         <content>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <left>
+                  <AnchorPane prefHeight="621.0" prefWidth="300.0" style="-fx-background-color: #0589ff;" BorderPane.alignment="CENTER">
+                     <children>
+                        <ChoiceBox fx:id="trucksChoiceBox" layoutX="75.0" layoutY="46.0" prefHeight="32.0" prefWidth="150.0" />
+                     </children>
+                  </AnchorPane>
+               </left>
+               <right>
+                  <AnchorPane prefHeight="621.0" prefWidth="500.0" style="-fx-background-color: grey;" BorderPane.alignment="CENTER" />
+               </right>
+            </BorderPane>
+         </content>
+      </Tab>
   </tabs>
 </TabPane>
