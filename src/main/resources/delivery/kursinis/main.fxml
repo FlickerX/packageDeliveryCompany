@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<TabPane fx:id="allTabs" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="1000.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="delivery.kursinis.fxContorllers.Main">
+  <tabs>
+    <Tab fx:id="registerUserTab" text="Register Account">
+         <content>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <left>
+                  <AnchorPane prefHeight="621.0" prefWidth="304.0" style="-fx-background-color: #0589ff;" BorderPane.alignment="CENTER">
+                     <children>
+                        <Text fill="WHITE" layoutX="32.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Package Delivery Company">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
+                        <ChoiceBox fx:id="userTypeChoiceBox" layoutX="59.0" layoutY="50.0" prefHeight="38.0" prefWidth="169.0" />
+                        <TextField fx:id="username" layoutX="68.0" layoutY="106.0" promptText="Username" />
+                        <PasswordField fx:id="password" layoutX="67.0" layoutY="151.0" promptText="Password" />
+                        <TextField fx:id="name" layoutX="67.0" layoutY="196.0" promptText="Name" />
+                        <TextField fx:id="surname" layoutX="67.0" layoutY="240.0" promptText="Surname" />
+                        <TextField fx:id="phoneNumber" layoutX="67.0" layoutY="286.0" promptText="Phone Number" text="+370" />
+                        <TextField fx:id="salary" layoutX="67.0" layoutY="336.0" promptText="Salary" />
+                        <TextField fx:id="driverLicense" layoutX="68.0" layoutY="383.0" promptText="Driver License" />
+                        <TextField fx:id="medicalCertificate" layoutX="67.0" layoutY="433.0" promptText="Medical Certificate" />
+                        <DatePicker fx:id="birthday" layoutX="55.0" layoutY="483.0" promptText="Birthday" />
+                        <Button fx:id="accountActionButton" layoutX="97.0" layoutY="536.0" mnemonicParsing="false" onAction="#createUserByAdmin" prefHeight="47.0" prefWidth="110.0" style="-fx-background-color: white;" text="Create User" />
+                     </children></AnchorPane>
+               </left>
+               <center>
+                  <AnchorPane prefHeight="621.0" prefWidth="679.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <ListView fx:id="managerList" layoutX="14.0" layoutY="58.0" prefHeight="544.0" prefWidth="264.0" />
+                        <ListView fx:id="courierList" layoutX="302.0" layoutY="58.0" prefHeight="544.0" prefWidth="255.0" />
+                        <Text layoutX="102.0" layoutY="42.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Managers">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
+                        <Text layoutX="382.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Couriers">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
+                        <Button fx:id="updateUserButton" layoutX="572.0" layoutY="79.0" mnemonicParsing="false" onAction="#updateUserData" prefHeight="47.0" prefWidth="110.0" style="-fx-background-color: #0589ff;" text="Update User" textFill="WHITE">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Button>
+                        <Button fx:id="removeUserButton" layoutX="572.0" layoutY="154.0" mnemonicParsing="false" onAction="#removeUser" prefHeight="47.0" prefWidth="110.0" style="-fx-background-color: #0589ff;" text="Remove User" textFill="WHITE">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+               </center>
+            </BorderPane>
+         </content></Tab>
+    <Tab fx:id="truckManagementTab" text="Truck Management">
+         <content>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <left>
+                  <AnchorPane prefHeight="621.0" prefWidth="368.0" style="-fx-background-color: #0589ff;" BorderPane.alignment="CENTER">
+                     <children>
+                        <Button fx:id="truckActionButton" layoutX="134.0" layoutY="508.0" mnemonicParsing="false" onAction="#createTruck" prefHeight="42.0" prefWidth="101.0" style="-fx-background-color: #white;" text="Add Truck" />
+                        <TextField fx:id="mark" layoutX="110.0" layoutY="64.0" promptText="Truck Mark" />
+                        <TextField fx:id="model" layoutX="110.0" layoutY="126.0" promptText="Truck Model" />
+                        <TextField fx:id="horsePower" layoutX="110.0" layoutY="189.0" promptText="Horse Power" />
+                        <TextField fx:id="engineLiters" layoutX="110.0" layoutY="250.0" promptText="Engine Liters" />
+                        <TextField fx:id="color" layoutX="110.0" layoutY="320.0" promptText="Truck Color" />
+                     </children></AnchorPane>
+               </left>
+               <right>
+                  <AnchorPane prefHeight="621.0" prefWidth="635.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <ListView fx:id="truckList" layoutX="94.0" layoutY="31.0" prefHeight="563.0" prefWidth="324.0" />
+                        <Button layoutX="508.0" layoutY="54.0" mnemonicParsing="false" onAction="#viewTruckDetails" prefHeight="40.0" prefWidth="84.0" text="View Details" />
+                        <Button layoutX="508.0" layoutY="123.0" mnemonicParsing="false" onAction="#updateTruckData" prefHeight="40.0" prefWidth="84.0" text="Update" />
+                        <Button layoutX="508.0" layoutY="192.0" mnemonicParsing="false" onAction="#deleteTruck" prefHeight="40.0" prefWidth="84.0" text="Delete Truck" />
+                     </children></AnchorPane>
+               </right>
+            </BorderPane>
+         </content></Tab>
+  </tabs>
+</TabPane>
