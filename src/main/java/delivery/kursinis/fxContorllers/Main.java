@@ -1,5 +1,6 @@
 package delivery.kursinis.fxContorllers;
 
+import delivery.kursinis.hibernate.CargoHib;
 import delivery.kursinis.hibernate.CheckpointHib;
 import delivery.kursinis.hibernate.TruckHib;
 import delivery.kursinis.hibernate.UserHib;
@@ -94,11 +95,34 @@ public class Main implements Initializable {
     public ListView<Checkpoint> checkpointList;
     @FXML
     public Button checkpointActionButton;
-
     CheckpointHib checkpointHib;
-
     //
-    public ListView trucksOrderList;
+
+    //TODO: Cargos
+    @FXML
+    public Tab cargoManagementTab;
+    @FXML
+    public TextField cargoNaming;
+    @FXML
+    public TextField cargoWeight;
+    @FXML
+    public ListView<Cargo> cargoList;
+
+    CargoHib cargoHib;
+    //--------------------------
+
+    //TODO: Orders
+    public ListView<Truck> truckOrderList;
+    public ListView<Manager> managersOrderList;
+    public ListView<Cargo> cargosOrderList;
+    public ListView<Courier> courierOrderList;
+    public ListView<Checkpoint> checkpointsOrderList;
+    public TextField destinationAddress;
+    public DatePicker destinationRequestedDeliveryDate;
+
+    public DatePicker destinationDeliveryStartDate;
+
+    //-----------------
     private EntityManagerFactory entityManagerFactory;
     private User user;
     private UserHib userHib;
@@ -120,6 +144,7 @@ public class Main implements Initializable {
         this.userHib = new UserHib(this.entityManagerFactory);
         this.truckHib = new TruckHib(this.entityManagerFactory);
         this.checkpointHib = new CheckpointHib(this.entityManagerFactory);
+        this.cargoHib = new CargoHib(this.entityManagerFactory);
 
         fillAllLists();
         disableData();
@@ -137,11 +162,29 @@ public class Main implements Initializable {
         List<Courier> allCouriers = userHib.getAllCouriers();
         List<Manager> allManagers = userHib.getAllManagers();
         List<Checkpoint> allCheckpoints = checkpointHib.getAllCheckpoints();
+        List<Cargo> allCargos = cargoHib.getAllCargos();
 
-        allTrucks.forEach(truck -> truckList.getItems().add(truck));
-        allCouriers.forEach(courier -> courierList.getItems().add(courier));
-        allManagers.forEach(manager -> managerList.getItems().add(manager));
-        allCheckpoints.forEach(checkpoint -> checkpointList.getItems().add(checkpoint));
+
+        for (Truck truck : allTrucks){ // TODO: Maybe refactor this shit
+            truckList.getItems().add(truck);
+            truckOrderList.getItems().add(truck);
+        }
+        for (Courier courier : allCouriers){
+            courierList.getItems().add(courier);
+            courierOrderList.getItems().add(courier);
+        }
+        for (Manager manager : allManagers){
+            managerList.getItems().add(manager);
+            managersOrderList.getItems().add(manager);
+        }
+        for (Checkpoint checkpoint : allCheckpoints){
+            checkpointList.getItems().add(checkpoint);
+            checkpointsOrderList.getItems().add(checkpoint);
+        }
+        for (Cargo cargo : allCargos){
+            cargoList.getItems().add(cargo);
+            cargosOrderList.getItems().add(cargo);
+        }
     }
 
     public void createUserByAdmin() {
@@ -304,5 +347,11 @@ public class Main implements Initializable {
     }
 
     public void deleteCheckpoint() {
+    }
+
+    public void createCargo() {
+        //TODO: Make sure all fields are filled
+        Cargo cargo = new Cargo(cargoNaming.getText(), Double.parseDouble(cargoWeight.getText()));
+        cargoHib.createCargo(cargo);
     }
 }
