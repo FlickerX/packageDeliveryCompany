@@ -45,8 +45,8 @@ public class Truck {
 
     @Override
     public String toString() {
-        return "Mark= " + mark +
-                ", Model='" + model +
+        return mark + " " +
+                model +
                 ", Engine liters=" + engineLiters +
                 ", Color='" + color;
     }

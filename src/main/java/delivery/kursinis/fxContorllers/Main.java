@@ -1,11 +1,9 @@
 package delivery.kursinis.fxContorllers;
 
+import delivery.kursinis.hibernate.CheckpointHib;
 import delivery.kursinis.hibernate.TruckHib;
 import delivery.kursinis.hibernate.UserHib;
-import delivery.kursinis.model.Courier;
-import delivery.kursinis.model.Manager;
-import delivery.kursinis.model.Truck;
-import delivery.kursinis.model.User;
+import delivery.kursinis.model.*;
 import delivery.kursinis.utils.DatabaseOperations;
 import delivery.kursinis.utils.FxUtils;
 import javafx.collections.FXCollections;
@@ -85,7 +83,21 @@ public class Main implements Initializable {
     @FXML
     public ChoiceBox trucksChoiceBox;
 
-    // Orders
+    //TODO: Checkpoints
+    @FXML
+    public Tab checkpointManagementTab;
+    @FXML
+    public TextField checkpointAddress;
+    @FXML
+    public DatePicker checkpointDate;
+    @FXML
+    public ListView<Checkpoint> checkpointList;
+    @FXML
+    public Button checkpointActionButton;
+
+    CheckpointHib checkpointHib;
+
+    //
     public ListView trucksOrderList;
     private EntityManagerFactory entityManagerFactory;
     private User user;
@@ -107,6 +119,8 @@ public class Main implements Initializable {
         this.user = user;
         this.userHib = new UserHib(this.entityManagerFactory);
         this.truckHib = new TruckHib(this.entityManagerFactory);
+        this.checkpointHib = new CheckpointHib(this.entityManagerFactory);
+
         fillAllLists();
         disableData();
     }
@@ -122,10 +136,12 @@ public class Main implements Initializable {
         List<Truck> allTrucks = truckHib.getAllTrucks();
         List<Courier> allCouriers = userHib.getAllCouriers();
         List<Manager> allManagers = userHib.getAllManagers();
+        List<Checkpoint> allCheckpoints = checkpointHib.getAllCheckpoints();
 
         allTrucks.forEach(truck -> truckList.getItems().add(truck));
         allCouriers.forEach(courier -> courierList.getItems().add(courier));
         allManagers.forEach(manager -> managerList.getItems().add(manager));
+        allCheckpoints.forEach(checkpoint -> checkpointList.getItems().add(checkpoint));
     }
 
     public void createUserByAdmin() {
@@ -174,7 +190,7 @@ public class Main implements Initializable {
         }
     }
 
-    public void createTruck(ActionEvent actionEvent) {
+    public void createTruck() {
         if (!fxUtils.areAllTruckFieldsFilled(mark.getText(), model.getText(), horsePower.getText(), engineLiters.getText(), color.getText())) {
             Truck truck = new Truck(mark.getText(), model.getText(), Double.parseDouble(engineLiters.getText()), Integer.parseInt(horsePower.getText()),
                     color.getText());
@@ -256,5 +272,37 @@ public class Main implements Initializable {
             medicalCertificate.setText(courier.getHealthCertificate());
             userHib.updateUser(courier);
         }
+    }
+
+    //Checkpoints
+    public void createCheckpoint(ActionEvent actionEvent) {
+        //TODO: Make here check if all fields are filled
+        Checkpoint checkpoint = new Checkpoint(checkpointAddress.getText(), checkpointDate.getValue());
+        checkpointHib.createCheckpoint(checkpoint);
+    }
+
+    public void viewCheckpointDetails() {
+    }
+
+    public void updateCheckpointData() {
+        checkpointActionButton.setText("Update Checkpoint");
+        fillCheckpointFields();
+    }
+
+    private void fillCheckpointFields() {
+        Checkpoint checkpoint = checkpointList.getSelectionModel().getSelectedItem();
+        checkpointAddress.setText(checkpoint.getAddress());
+        checkpointDate.setValue(checkpoint.getCheckpointDate());
+        checkpointActionButton.setOnAction(actionEvent -> {
+            updateCheckpoint(checkpoint);
+        });
+    }
+    private void updateCheckpoint(Checkpoint checkpoint){
+        checkpoint.setAddress(checkpointAddress.getText());
+        checkpoint.setCheckpointDate(checkpointDate.getValue());
+        checkpointHib.updateCheckpoint(checkpoint);
+    }
+
+    public void deleteCheckpoint() {
     }
 }

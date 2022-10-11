@@ -36,7 +36,7 @@
                         <TextField fx:id="driverLicense" layoutX="67.0" layoutY="456.0" prefHeight="35.0" prefWidth="180.0" promptText="Driver License" />
                         <TextField fx:id="medicalCertificate" layoutX="67.0" layoutY="521.0" prefHeight="35.0" prefWidth="180.0" promptText="Medical Certificate" />
                         <DatePicker fx:id="birthday" layoutX="67.0" layoutY="588.0" prefHeight="35.0" prefWidth="180.0" promptText="Birthday" />
-                        <Button fx:id="accountActionButton" layoutX="102.0" layoutY="643.0" mnemonicParsing="false" onAction="#createUserByAdmin" prefHeight="47.0" prefWidth="110.0" style="-fx-background-color: white;" text="Create User" />
+                        <Button fx:id="accountActionButton" layoutX="102.0" layoutY="643.0" mnemonicParsing="false" onAction="#createUserByAdmin" prefHeight="45.0" prefWidth="110.0" style="-fx-background-color: white;" text="Create User" />
                      </children></AnchorPane>
                </left>
                <center>
@@ -75,7 +75,7 @@
                <left>
                   <AnchorPane prefHeight="621.0" prefWidth="400.0" style="-fx-background-color: #0589ff;" BorderPane.alignment="CENTER">
                      <children>
-                        <Button fx:id="truckActionButton" layoutX="134.0" layoutY="508.0" mnemonicParsing="false" onAction="#createTruck" prefHeight="42.0" prefWidth="101.0" style="-fx-background-color: #white;" text="Add Truck" />
+                        <Button fx:id="truckActionButton" layoutX="134.0" layoutY="508.0" mnemonicParsing="false" onAction="#createTruck" prefHeight="45.0" prefWidth="110.0" style="-fx-background-color: #white;" text="Add Truck" />
                         <TextField fx:id="mark" layoutX="110.0" layoutY="64.0" promptText="Truck Mark" />
                         <TextField fx:id="model" layoutX="110.0" layoutY="126.0" promptText="Truck Model" />
                         <TextField fx:id="horsePower" layoutX="110.0" layoutY="189.0" promptText="Horse Power" />
@@ -119,6 +119,47 @@
                            </font>
                         </Button>
                      </children></AnchorPane>
+               </right>
+            </BorderPane>
+         </content>
+      </Tab>
+      <Tab fx:id="checkpointManagementTab" text="Checkpoint Management'">
+         <content>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <left>
+                  <AnchorPane prefHeight="200.0" prefWidth="400.0" style="-fx-background-color: #0589ff;" BorderPane.alignment="CENTER">
+                     <children>
+                        <TextField fx:id="checkpointAddress" layoutX="117.0" layoutY="81.0" prefHeight="35.0" prefWidth="180.0" promptText="Adress" />
+                        <DatePicker fx:id="checkpointDate" layoutX="117.0" layoutY="166.0" prefHeight="35.0" prefWidth="180.0" promptText="Checkpoint Date" />
+                        <Button fx:id="checkpointActionButton" layoutX="137.0" layoutY="259.0" mnemonicParsing="false" onAction="#createCheckpoint" prefHeight="45.0" prefWidth="140.0" style="-fx-background-color: white;" text="Create Checkpoint">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </AnchorPane>
+               </left>
+               <right>
+                  <AnchorPane prefHeight="200.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <ListView fx:id="checkpointList" layoutX="42.0" layoutY="22.0" prefHeight="677.0" prefWidth="383.0" />
+                        <Button layoutX="607.0" layoutY="71.0" mnemonicParsing="false" onAction="#viewCheckpointDetails" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="View Details" textFill="WHITE">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                        <Button layoutX="607.0" layoutY="177.0" mnemonicParsing="false" onAction="#updateCheckpointData" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Update" textFill="WHITE">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                        <Button layoutX="607.0" layoutY="281.0" mnemonicParsing="false" onAction="#deleteCheckpoint" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Delete" textFill="WHITE">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </AnchorPane>
                </right>
             </BorderPane>
          </content>

@@ -25,4 +25,15 @@ public class Checkpoint {
 
     @ManyToMany (mappedBy = "checkpoints", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Destination> destinations;
+
+    public Checkpoint(String address, LocalDate checkpointDate) {
+        this.address = address;
+        this.checkpointDate = checkpointDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Address= " + address +
+                ", Date=" + checkpointDate;
+    }
 }
