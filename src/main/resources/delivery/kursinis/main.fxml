@@ -111,18 +111,16 @@
                      <children>
                         <TextField fx:id="destinationAddress" layoutX="110.0" layoutY="73.0" prefHeight="35.0" prefWidth="180.0" promptText="Address" />
                         <DatePicker fx:id="destinationRequestedDeliveryDate" layoutX="110.0" layoutY="151.0" prefHeight="35.0" prefWidth="180.0" promptText="Requested Delivery Day" />
-                        <DatePicker fx:id="destinationDeliveryStartDate" layoutX="110.0" layoutY="219.0" prefHeight="35.0" prefWidth="180.0" promptText="Delivery Start Day" />
+                        <ChoiceBox fx:id="trucksChoiceBox" layoutX="110.0" layoutY="227.0" prefHeight="35.0" prefWidth="180.0" />
+                        <ChoiceBox fx:id="couriersChoiceBox" layoutX="110.0" layoutY="302.0" prefHeight="35.0" prefWidth="180.0" />
                      </children></AnchorPane>
                </left>
                <right>
                   <AnchorPane prefHeight="621.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                      <children>
-                        <ListView fx:id="truckOrderList" layoutX="27.0" layoutY="22.0" prefHeight="255.0" prefWidth="190.0" />
-                        <ListView fx:id="managersOrderList" layoutX="459.0" layoutY="417.0" prefHeight="255.0" prefWidth="269.0" />
-                        <ListView fx:id="cargosOrderList" layoutX="20.0" layoutY="417.0" prefHeight="255.0" prefWidth="269.0" />
-                        <ListView fx:id="courierOrderList" layoutX="305.0" layoutY="22.0" prefHeight="255.0" prefWidth="190.0" />
-                        <ListView fx:id="checkpointsOrderList" layoutX="579.0" layoutY="22.0" prefHeight="255.0" prefWidth="190.0" />
-                        <Button layoutX="338.0" layoutY="330.0" mnemonicParsing="false" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Create Order" textFill="WHITE">
+                        <ListView fx:id="managersOrderList" layoutX="459.0" layoutY="64.0" prefHeight="627.0" prefWidth="269.0" />
+                        <ListView fx:id="cargosOrderList" layoutX="30.0" layoutY="66.0" prefHeight="625.0" prefWidth="269.0" />
+                        <Button layoutX="317.0" layoutY="319.0" mnemonicParsing="false" onAction="#createOrder" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Create Order" textFill="WHITE">
                            <font>
                               <Font size="16.0" />
                            </font>
@@ -189,6 +187,40 @@
                   <AnchorPane prefHeight="200.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                      <children>
                         <ListView fx:id="cargoList" layoutX="54.0" layoutY="32.0" prefHeight="654.0" prefWidth="327.0" />
+                     </children>
+                  </AnchorPane>
+               </right>
+            </BorderPane>
+         </content>
+      </Tab>
+      <Tab fx:id="ordersTab" text="Orders">
+         <content>
+            <BorderPane prefHeight="200.0" prefWidth="200.0">
+               <left>
+                  <AnchorPane prefHeight="200.0" prefWidth="400.0" style="-fx-background-color: #0589ff;" BorderPane.alignment="CENTER">
+                     <children>
+                        <Button layoutX="135.0" layoutY="69.0" mnemonicParsing="false" onAction="#setOrderToCurrentUser" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: White;" text="Assign Order">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                     </children></AnchorPane>
+               </left>
+               <right>
+                  <AnchorPane prefHeight="200.0" prefWidth="800.0" BorderPane.alignment="CENTER">
+                     <children>
+                        <ListView fx:id="assignedOrdersList" layoutX="22.0" layoutY="49.0" prefHeight="658.0" prefWidth="336.0" />
+                        <Text layoutX="119.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Assigned Orders">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Text>
+                        <ListView fx:id="allOrdersList" layoutX="419.0" layoutY="49.0" prefHeight="658.0" prefWidth="336.0" />
+                        <Text layoutX="548.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="All Orders">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                        </Text>
                      </children>
                   </AnchorPane>
                </right>

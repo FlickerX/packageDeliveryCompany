@@ -1,9 +1,7 @@
 package delivery.kursinis.fxContorllers;
 
-import delivery.kursinis.hibernate.CargoHib;
-import delivery.kursinis.hibernate.CheckpointHib;
-import delivery.kursinis.hibernate.TruckHib;
-import delivery.kursinis.hibernate.UserHib;
+import delivery.kursinis.Enums.OrderStatus;
+import delivery.kursinis.hibernate.*;
 import delivery.kursinis.model.*;
 import delivery.kursinis.utils.DatabaseOperations;
 import delivery.kursinis.utils.FxUtils;
@@ -25,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -81,8 +80,6 @@ public class Main implements Initializable {
     public ListView<Truck> truckList;
     @FXML
     public Tab orderManagementTab;
-    @FXML
-    public ChoiceBox trucksChoiceBox;
 
     //TODO: Checkpoints
     @FXML
@@ -112,29 +109,38 @@ public class Main implements Initializable {
     //--------------------------
 
     //TODO: Orders
-    public ListView<Truck> truckOrderList;
     public ListView<Manager> managersOrderList;
     public ListView<Cargo> cargosOrderList;
-    public ListView<Courier> courierOrderList;
-    public ListView<Checkpoint> checkpointsOrderList;
     public TextField destinationAddress;
     public DatePicker destinationRequestedDeliveryDate;
-
     public DatePicker destinationDeliveryStartDate;
+    @FXML
+    public ChoiceBox trucksChoiceBox;
+    public ChoiceBox couriersChoiceBox;
+
+
+
+    public Tab ordersTab;
+
+    public ListView assignedOrdersList;
+
+    public ListView allOrdersList;
 
     //-----------------
     private EntityManagerFactory entityManagerFactory;
     private User user;
     private UserHib userHib;
     private TruckHib truckHib;
+    private DestinationHib destinationHib;
     private String[] checkBoxValues = {"Courier", "Manager", "Admin Manager"};
 
-    private String[] trucksChoiceBoxValues;
     private FxUtils fxUtils = new FxUtils();
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         userTypeChoiceBox.getItems().addAll(checkBoxValues);
+//        trucksChoiceBox.getItems().addAll(trucksChoiceBoxValues);
         userTypeChoiceBox.setOnAction(actionEvent -> hideFields(userTypeChoiceBox.getValue()));
     }
 
@@ -144,7 +150,17 @@ public class Main implements Initializable {
         this.userHib = new UserHib(this.entityManagerFactory);
         this.truckHib = new TruckHib(this.entityManagerFactory);
         this.checkpointHib = new CheckpointHib(this.entityManagerFactory);
+        this.destinationHib = new DestinationHib(this.entityManagerFactory);
         this.cargoHib = new CargoHib(this.entityManagerFactory);
+
+
+        List<Truck> allTrucks = truckHib.getAllTrucks();
+        List<Courier> allCouriers = userHib.getAllCouriers();
+        for (Truck truck : allTrucks)
+            trucksChoiceBox.getItems().add(truck);
+
+        for (Courier courier : allCouriers)
+            couriersChoiceBox.getItems().add(courier);
 
         fillAllLists();
         disableData();
@@ -163,28 +179,28 @@ public class Main implements Initializable {
         List<Manager> allManagers = userHib.getAllManagers();
         List<Checkpoint> allCheckpoints = checkpointHib.getAllCheckpoints();
         List<Cargo> allCargos = cargoHib.getAllCargos();
+        List<Destination> allDestinations = destinationHib.getAllDestinations();
 
 
-        for (Truck truck : allTrucks){ // TODO: Maybe refactor this shit
+        for (Truck truck : allTrucks) // TODO: Maybe refactor this shit
             truckList.getItems().add(truck);
-            truckOrderList.getItems().add(truck);
-        }
-        for (Courier courier : allCouriers){
+
+        for (Courier courier : allCouriers)
             courierList.getItems().add(courier);
-            courierOrderList.getItems().add(courier);
-        }
+
         for (Manager manager : allManagers){
             managerList.getItems().add(manager);
             managersOrderList.getItems().add(manager);
         }
-        for (Checkpoint checkpoint : allCheckpoints){
+        for (Checkpoint checkpoint : allCheckpoints)
             checkpointList.getItems().add(checkpoint);
-            checkpointsOrderList.getItems().add(checkpoint);
-        }
+
         for (Cargo cargo : allCargos){
             cargoList.getItems().add(cargo);
             cargosOrderList.getItems().add(cargo);
         }
+        for (Destination destination : allDestinations)
+            allOrdersList.getItems().add(destination);
     }
 
     public void createUserByAdmin() {
@@ -353,5 +369,18 @@ public class Main implements Initializable {
         //TODO: Make sure all fields are filled
         Cargo cargo = new Cargo(cargoNaming.getText(), Double.parseDouble(cargoWeight.getText()));
         cargoHib.createCargo(cargo);
+    }
+
+    public void createOrder() {
+        List<Manager> selectedManagers = managersOrderList.getSelectionModel().getSelectedItems(); // TODO: Make here validation
+        List<Cargo> selectedCargos = cargosOrderList.getSelectionModel().getSelectedItems();
+        Destination destination = new Destination(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING, selectedManagers, selectedCargos);
+        destinationHib.createDestination(destination);
+        allOrdersList.getItems().add(destination);
+    }
+
+    public void setOrderToCurrentUser() {
+        Destination destination = (Destination) allOrdersList.getSelectionModel().getSelectedItem();
+//        destination.setCourier(user);
     }
 }

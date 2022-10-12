@@ -23,6 +23,8 @@ public class Truck {
     private Integer horsePower;
     private String color;
 
+    private Boolean isAvailable;
+
     @OneToOne
     private Destination destination;
 

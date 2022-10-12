@@ -29,8 +29,8 @@ public class Courier extends User{
 
     @Override
     public String toString() {
-        return "Name = " + getName() +
-                ", Surname = " + getSurname() +
+        return getName() +
+                " " + getSurname() +
                 ", Username = " + getLogin();
     }
 }
