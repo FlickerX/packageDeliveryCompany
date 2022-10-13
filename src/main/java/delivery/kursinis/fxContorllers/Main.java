@@ -1,6 +1,7 @@
 package delivery.kursinis.fxContorllers;
 
 import delivery.kursinis.Enums.OrderStatus;
+import delivery.kursinis.HelloApplication;
 import delivery.kursinis.hibernate.*;
 import delivery.kursinis.model.*;
 import delivery.kursinis.utils.DatabaseOperations;
@@ -10,13 +11,19 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.InputMethodEvent;
+import javafx.stage.Stage;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -81,20 +88,6 @@ public class Main implements Initializable {
     @FXML
     public Tab orderManagementTab;
 
-    //TODO: Checkpoints
-    @FXML
-    public Tab checkpointManagementTab;
-    @FXML
-    public TextField checkpointAddress;
-    @FXML
-    public DatePicker checkpointDate;
-    @FXML
-    public ListView<Checkpoint> checkpointList;
-    @FXML
-    public Button checkpointActionButton;
-    CheckpointHib checkpointHib;
-    //
-
     //TODO: Cargos
     @FXML
     public Tab cargoManagementTab;
@@ -126,6 +119,16 @@ public class Main implements Initializable {
 
     public ListView allOrdersList;
 
+    @FXML
+    public ChoiceBox trucksChoiceBoxOrders;
+    @FXML
+    public TextField checkpointField;
+    @FXML
+    public Button addCheckpointButton;
+    @FXML
+    public DatePicker checkpointDate;
+    @FXML
+    public ChoiceBox managerChoiceBoxOrders;
     //-----------------
     private EntityManagerFactory entityManagerFactory;
     private User user;
@@ -149,18 +152,23 @@ public class Main implements Initializable {
         this.user = user;
         this.userHib = new UserHib(this.entityManagerFactory);
         this.truckHib = new TruckHib(this.entityManagerFactory);
-        this.checkpointHib = new CheckpointHib(this.entityManagerFactory);
         this.destinationHib = new DestinationHib(this.entityManagerFactory);
         this.cargoHib = new CargoHib(this.entityManagerFactory);
 
 
         List<Truck> allTrucks = truckHib.getAllTrucks();
         List<Courier> allCouriers = userHib.getAllCouriers();
-        for (Truck truck : allTrucks)
+        List<Manager> allManagers = userHib.getAllManagers();
+        for (Truck truck : allTrucks){
+            trucksChoiceBoxOrders.getItems().add(truck);
             trucksChoiceBox.getItems().add(truck);
+        }
 
         for (Courier courier : allCouriers)
             couriersChoiceBox.getItems().add(courier);
+
+        for (Manager manager : allManagers)
+            managerChoiceBoxOrders.getItems().add(manager);
 
         fillAllLists();
         disableData();
@@ -170,6 +178,8 @@ public class Main implements Initializable {
         if (user.getClass() == Courier.class) {
             allTabs.getTabs().remove(truckManagementTab);
             allTabs.getTabs().remove(registerUserTab);
+            allTabs.getTabs().remove(orderManagementTab);
+            allTabs.getTabs().remove(cargoManagementTab);
         }
     }
 
@@ -177,7 +187,6 @@ public class Main implements Initializable {
         List<Truck> allTrucks = truckHib.getAllTrucks();
         List<Courier> allCouriers = userHib.getAllCouriers();
         List<Manager> allManagers = userHib.getAllManagers();
-        List<Checkpoint> allCheckpoints = checkpointHib.getAllCheckpoints();
         List<Cargo> allCargos = cargoHib.getAllCargos();
         List<Destination> allDestinations = destinationHib.getAllDestinations();
 
@@ -192,18 +201,38 @@ public class Main implements Initializable {
             managerList.getItems().add(manager);
             managersOrderList.getItems().add(manager);
         }
-        for (Checkpoint checkpoint : allCheckpoints)
-            checkpointList.getItems().add(checkpoint);
 
         for (Cargo cargo : allCargos){
             cargoList.getItems().add(cargo);
             cargosOrderList.getItems().add(cargo);
         }
-        for (Destination destination : allDestinations)
+        for (Destination destination : allDestinations){
             allOrdersList.getItems().add(destination);
-    }
+                if (destination.getCourier().getId() == user.getId()){
+                    assignedOrdersList.getItems().add(destination);
+            }
+        }
 
+        cargosOrderList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        managersOrderList.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+    }
+    public void hideFields(String choiceBoxValue) {
+        switch (choiceBoxValue) {
+            case "Courier":
+                driverLicense.setDisable(false);
+                medicalCertificate.setDisable(false);
+                break;
+            case "Manager":
+            case "Admin Manager":
+                driverLicense.setDisable(true);
+                medicalCertificate.setDisable(true);
+                break;
+        }
+    }
     public void createUserByAdmin() {
+        if (userTypeChoiceBox.getValue() == null)
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "You have to specify user type!");
         switch (userTypeChoiceBox.getValue()) {
             case "Courier":
                 Courier courier = null;
@@ -234,73 +263,15 @@ public class Main implements Initializable {
                 break;
         }
     }
-
-    public void hideFields(String choiceBoxValue) {
-        switch (choiceBoxValue) {
-            case "Courier":
-                driverLicense.setDisable(false);
-                medicalCertificate.setDisable(false);
-                break;
-            case "Manager":
-            case "Admin Manager":
-                driverLicense.setDisable(true);
-                medicalCertificate.setDisable(true);
-                break;
-        }
-    }
-
-    public void createTruck() {
-        if (!fxUtils.areAllTruckFieldsFilled(mark.getText(), model.getText(), horsePower.getText(), engineLiters.getText(), color.getText())) {
-            Truck truck = new Truck(mark.getText(), model.getText(), Double.parseDouble(engineLiters.getText()), Integer.parseInt(horsePower.getText()),
-                    color.getText());
-            truckHib.createTruck(truck);
-        } else {
-            fxUtils.alertMessage(Alert.AlertType.WARNING, "Truck creating warning", "Validation error", "All fields has to be filled");
-        }
-    }
-
-    public void updateTruckData() {
-        truckActionButton.setText("Update Truck");
-        fillTruckFields();
-    }
-
-    private void fillTruckFields() {
-        Truck truck = truckList.getSelectionModel().getSelectedItem();
-        mark.setText(truck.getMark());
-        model.setText(truck.getModel());
-        horsePower.setText(Integer.toString(truck.getHorsePower()));
-        engineLiters.setText(Double.toString(truck.getEngineLiters()));
-        color.setText(truck.getColor());
-
-        truckActionButton.setOnAction(actionEvent -> {
-            updateTruck(truck);
-        });
-
-    }
-
-    private void updateTruck(Truck truck) {
-        truck.setMark(mark.getText());
-        truck.setModel(model.getText());
-        truck.setHorsePower(Integer.parseInt(horsePower.getText()));
-        truck.setEngineLiters(Double.parseDouble(engineLiters.getText()));
-        truck.setColor(color.getText());
-        truckHib.updateTruck(truck);
-    }
-
-    public void deleteTruck() {
-    }
-
-    public void viewTruckDetails(ActionEvent actionEvent) {
-    }
-
-    public void removeUser() {
-    }
-
     public void updateUserData() {
         accountActionButton.setText("Update User");
         fillUserFields();
     }
-
+    public void removeUser() {
+        User user1 = courierList.getSelectionModel().getSelectedItem();
+        userHib.removeUser(user1);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "User was successfully deleted");
+    }
     private void fillUserFields() { // TODO: I need to refactor this
         if (managerList.getSelectionModel().getSelectedItem() != null) {
             Manager manager = managerList.getSelectionModel().getSelectedItem();
@@ -332,37 +303,49 @@ public class Main implements Initializable {
             userHib.updateUser(courier);
         }
     }
-
-    //Checkpoints
-    public void createCheckpoint(ActionEvent actionEvent) {
-        //TODO: Make here check if all fields are filled
-        Checkpoint checkpoint = new Checkpoint(checkpointAddress.getText(), checkpointDate.getValue());
-        checkpointHib.createCheckpoint(checkpoint);
+    public void createTruck() {
+//        if (!fxUtils.areAllTruckFieldsFilled(mark.getText(), model.getText(), horsePower.getText(), engineLiters.getText(), color.getText())) {
+//            Truck truck = new Truck(mark.getText(), model.getText(), Double.parseDouble(engineLiters.getText()), Integer.parseInt(horsePower.getText()),
+//                    color.getText());
+//            truckHib.createTruck(truck);
+//        } else {
+//            fxUtils.alertMessage(Alert.AlertType.WARNING, "Truck creating warning", "Validation error", "All fields has to be filled");
+//        }
+        fxUtils.isInteger(horsePower.getText());
+//        fxUtils.isInteger(horsePower.getText());
+    }
+    public void updateTruckData() {
+        truckActionButton.setText("Update Truck");
+        fillTruckFields();
     }
 
-    public void viewCheckpointDetails() {
-    }
+    private void fillTruckFields() {
+        Truck truck = truckList.getSelectionModel().getSelectedItem();
+        mark.setText(truck.getMark());
+        model.setText(truck.getModel());
+        horsePower.setText(Integer.toString(truck.getHorsePower()));
+        engineLiters.setText(Double.toString(truck.getEngineLiters()));
+        color.setText(truck.getColor());
 
-    public void updateCheckpointData() {
-        checkpointActionButton.setText("Update Checkpoint");
-        fillCheckpointFields();
-    }
-
-    private void fillCheckpointFields() {
-        Checkpoint checkpoint = checkpointList.getSelectionModel().getSelectedItem();
-        checkpointAddress.setText(checkpoint.getAddress());
-        checkpointDate.setValue(checkpoint.getCheckpointDate());
-        checkpointActionButton.setOnAction(actionEvent -> {
-            updateCheckpoint(checkpoint);
+        truckActionButton.setOnAction(actionEvent -> {
+            updateTruck(truck);
         });
-    }
-    private void updateCheckpoint(Checkpoint checkpoint){
-        checkpoint.setAddress(checkpointAddress.getText());
-        checkpoint.setCheckpointDate(checkpointDate.getValue());
-        checkpointHib.updateCheckpoint(checkpoint);
+
     }
 
-    public void deleteCheckpoint() {
+    private void updateTruck(Truck truck) {
+        truck.setMark(mark.getText());
+        truck.setModel(model.getText());
+        truck.setHorsePower(Integer.parseInt(horsePower.getText()));
+        truck.setEngineLiters(Double.parseDouble(engineLiters.getText()));
+        truck.setColor(color.getText());
+        truckHib.updateTruck(truck);
+    }
+
+    public void deleteTruck() {
+        Truck truck = truckList.getSelectionModel().getSelectedItem();
+        truckHib.removeTruck(truck);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "Truck was successfully deleted");
     }
 
     public void createCargo() {
@@ -381,6 +364,52 @@ public class Main implements Initializable {
 
     public void setOrderToCurrentUser() {
         Destination destination = (Destination) allOrdersList.getSelectionModel().getSelectedItem();
-//        destination.setCourier(user);
+        if (destination.getCourier() != null)
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Setting completed", "Error", "There is already assigned Courier to order");
+        else if (user.getClass() == Courier.class && destination.getCourier() == null){
+            Courier courier = userHib.getCourierByID(user.getId());
+            destination.setCourier(courier);
+            destinationHib.updateDestination(destination);
+        }
+//        else{
+//            Manager manager = userHib.getManagerByID(user.getId());
+//            destination.setManagers(manager);
+//            destinationHib.updateDestination(destination); //TODO: Maybe it work with managers array
+//        }
+    }
+
+    public void assignTruckToOrder() {
+        //TODO: Check if value from choiceBox is selected
+        Destination destination = (Destination) allOrdersList.getSelectionModel().getSelectedItem(); //TODO: Warning if truck is filleed
+        destination.setTruck((Truck) trucksChoiceBoxOrders.getValue());
+        destinationHib.updateDestination(destination);
+    }
+
+    public void deleteCargo(ActionEvent actionEvent) {
+        Cargo cargo = cargoList.getSelectionModel().getSelectedItem();
+        cargoHib.removeCargo(cargo);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "Cargo was successfully deleted");
+    }
+
+    public void updateCargo(ActionEvent actionEvent) {
+    }
+
+    public void addCheckpointToOrder() {
+        if (fxUtils.isCheckpointFieldInputed(checkpointField.getText(), checkpointDate.getValue())){
+            fxUtils.alertMessage(Alert.AlertType.WARNING, "Checkpoint creating warning", "Validation error", "All fields has to be filled");
+        }else
+            System.out.println("Hello");
+
+    }
+
+    public void assignManagerToOrder() {
+        Destination destination = (Destination) allOrdersList.getSelectionModel().getSelectedItem();
+        Manager manager = (Manager) managerChoiceBoxOrders.getValue();
+        destination.setManagers(manager);
+        destinationHib.updateDestination(destination); //TODO: Maybe it work with managers array
+    }
+
+    public void checkOrInteger() {
+        System.out.println("Hello");
     }
 }

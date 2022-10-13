@@ -41,7 +41,7 @@ public class Destination {
     @ManyToMany
     private List<Checkpoint> checkpoints;
 
-    @OneToOne
+    @ManyToOne
     private Courier courier;
 
     @OneToOne
@@ -74,5 +74,9 @@ public class Destination {
                 " " + status +
                 ", courier=" + courier +
                 ", truck=" + truck;
+    }
+
+    public void setManagers(Manager manager) {
+        this.managers.add(manager);
     }
 }

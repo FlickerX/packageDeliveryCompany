@@ -36,6 +36,7 @@ public class UserHib {
     }
 
     public void updateUser(User user){
+        entityManager = entityManagerFactory.createEntityManager();
         try{
             entityManager.getTransaction().begin();
             entityManager.merge(user);
@@ -46,6 +47,20 @@ public class UserHib {
             if (entityManager != null) entityManager.close();
         }
     }
+
+    public void removeUser(User user){
+        entityManager = entityManagerFactory.createEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.remove(entityManager.contains(user) ? user : entityManager.merge(user));
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (entityManager != null) entityManager.close();
+        }
+    }
+
 
     //TODO: Make filters here for user
 
@@ -60,6 +75,30 @@ public class UserHib {
             System.out.println("No such user");
         }
         return user;
+    }
+    public Courier getCourierByID(int id){
+        entityManager = entityManagerFactory.createEntityManager();
+        Courier courier = null;
+        try{
+            entityManager.getTransaction().begin();
+            courier = entityManager.find(Courier.class, id);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            System.out.println("No such user");
+        }
+        return courier;
+    }
+    public Manager getManagerByID(int id){
+        entityManager = entityManagerFactory.createEntityManager();
+        Manager manager = null;
+        try{
+            entityManager.getTransaction().begin();
+            manager = entityManager.find(Manager.class, id);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            System.out.println("No such user");
+        }
+        return manager;
     }
     public User getUserByLoginData(String login, String password, boolean isManager){
         entityManager = entityManagerFactory.createEntityManager();

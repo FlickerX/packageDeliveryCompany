@@ -2,6 +2,7 @@ package delivery.kursinis.hibernate;
 
 import delivery.kursinis.model.Cargo;
 import delivery.kursinis.model.Checkpoint;
+import delivery.kursinis.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -43,5 +44,17 @@ public class CargoHib {
                 entityManager.close();
         }
         return new ArrayList<Cargo>();
+    }
+    public void removeCargo(Cargo cargo){
+        entityManager = entityManagerFactory.createEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.remove(entityManager.contains(cargo) ? cargo : entityManager.merge(cargo));
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (entityManager != null) entityManager.close();
+        }
     }
 }

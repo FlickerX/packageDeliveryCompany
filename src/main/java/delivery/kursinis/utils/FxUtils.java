@@ -25,4 +25,16 @@ public class FxUtils {
     public boolean areAllTruckFieldsFilled(String mark, String model, String horsePower, String engineLiters, String color){ // TODO: Make sure to change String to integerts and double
         return mark.isEmpty() || model.isEmpty() || horsePower.isEmpty() || engineLiters.isEmpty() || color.isEmpty();
     }
+    public boolean isCheckpointFieldInputed(String checkpoint, LocalDate checkpointDate){ // TODO: Make sure to change String to integerts and double
+        return checkpoint.isEmpty() || checkpointDate == null;
+    }
+    public boolean isInteger(String text){
+        int number;
+        try{
+            number = Integer.parseInt(text);
+        } catch (NumberFormatException e){
+            alertMessage(Alert.AlertType.WARNING, "Field Type Warning", "Type Error", "Field is not Integer type");
+        }
+        return true;
+    }
 }

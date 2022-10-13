@@ -54,12 +54,12 @@
                               <Font size="20.0" />
                            </font>
                         </Text>
-                        <Button fx:id="updateUserButton" layoutX="745.0" layoutY="92.0" mnemonicParsing="false" onAction="#updateUserData" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Update User" textFill="WHITE">
+                        <Button layoutX="745.0" layoutY="63.0" mnemonicParsing="false" onAction="#updateUserData" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Update User" textFill="WHITE">
                            <font>
                               <Font size="14.0" />
                            </font>
                         </Button>
-                        <Button fx:id="removeUserButton" layoutX="745.0" layoutY="188.0" mnemonicParsing="false" onAction="#removeUser" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Remove User" textFill="WHITE">
+                        <Button layoutX="745.0" layoutY="177.0" mnemonicParsing="false" onAction="#removeUser" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Remove User" textFill="WHITE">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -87,15 +87,11 @@
                   <AnchorPane prefHeight="621.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                      <children>
                         <ListView fx:id="truckList" layoutX="22.0" layoutY="18.0" prefHeight="681.0" prefWidth="414.0" />
-                        <Button layoutX="576.0" layoutY="53.0" mnemonicParsing="false" onAction="#viewTruckDetails" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="View Details" textFill="WHITE">
+                        <Button layoutX="576.0" layoutY="40.0" mnemonicParsing="false" onAction="#updateTruckData" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Update Truck" textFill="WHITE">
                            <font>
                               <Font size="16.0" />
                            </font></Button>
-                        <Button layoutX="576.0" layoutY="148.0" mnemonicParsing="false" onAction="#updateTruckData" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Update" textFill="WHITE">
-                           <font>
-                              <Font size="16.0" />
-                           </font></Button>
-                        <Button layoutX="576.0" layoutY="236.0" mnemonicParsing="false" onAction="#deleteTruck" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Delete Truck" textFill="WHITE">
+                        <Button layoutX="576.0" layoutY="148.0" mnemonicParsing="false" onAction="#deleteTruck" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Delete Truck" textFill="WHITE">
                            <font>
                               <Font size="16.0" />
                            </font></Button>
@@ -125,48 +121,17 @@
                               <Font size="16.0" />
                            </font>
                         </Button>
+                        <Text layoutX="134.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Cargos">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
+                        <Text layoutX="563.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Managers">
+                           <font>
+                              <Font size="20.0" />
+                           </font>
+                        </Text>
                      </children></AnchorPane>
-               </right>
-            </BorderPane>
-         </content>
-      </Tab>
-      <Tab fx:id="checkpointManagementTab" text="Checkpoint Management">
-         <content>
-            <BorderPane prefHeight="200.0" prefWidth="200.0">
-               <left>
-                  <AnchorPane prefHeight="200.0" prefWidth="400.0" style="-fx-background-color: #0589ff;" BorderPane.alignment="CENTER">
-                     <children>
-                        <TextField fx:id="checkpointAddress" layoutX="117.0" layoutY="81.0" prefHeight="35.0" prefWidth="180.0" promptText="Adress" />
-                        <DatePicker fx:id="checkpointDate" layoutX="117.0" layoutY="166.0" prefHeight="35.0" prefWidth="180.0" promptText="Checkpoint Date" />
-                        <Button fx:id="checkpointActionButton" layoutX="137.0" layoutY="259.0" mnemonicParsing="false" onAction="#createCheckpoint" prefHeight="45.0" prefWidth="140.0" style="-fx-background-color: white;" text="Create Checkpoint">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                        </Button>
-                     </children>
-                  </AnchorPane>
-               </left>
-               <right>
-                  <AnchorPane prefHeight="200.0" prefWidth="800.0" BorderPane.alignment="CENTER">
-                     <children>
-                        <ListView fx:id="checkpointList" layoutX="42.0" layoutY="22.0" prefHeight="677.0" prefWidth="383.0" />
-                        <Button layoutX="607.0" layoutY="71.0" mnemonicParsing="false" onAction="#viewCheckpointDetails" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="View Details" textFill="WHITE">
-                           <font>
-                              <Font size="16.0" />
-                           </font>
-                        </Button>
-                        <Button layoutX="607.0" layoutY="177.0" mnemonicParsing="false" onAction="#updateCheckpointData" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Update" textFill="WHITE">
-                           <font>
-                              <Font size="16.0" />
-                           </font>
-                        </Button>
-                        <Button layoutX="607.0" layoutY="281.0" mnemonicParsing="false" onAction="#deleteCheckpoint" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Delete" textFill="WHITE">
-                           <font>
-                              <Font size="16.0" />
-                           </font>
-                        </Button>
-                     </children>
-                  </AnchorPane>
                </right>
             </BorderPane>
          </content>
@@ -187,6 +152,16 @@
                   <AnchorPane prefHeight="200.0" prefWidth="800.0" BorderPane.alignment="CENTER">
                      <children>
                         <ListView fx:id="cargoList" layoutX="54.0" layoutY="32.0" prefHeight="654.0" prefWidth="327.0" />
+                        <Button layoutX="589.0" layoutY="58.0" mnemonicParsing="false" onAction="#updateCargo" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Update Cargo" textFill="WHITE">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
+                        <Button layoutX="589.0" layoutY="159.0" mnemonicParsing="false" onAction="#deleteCargo" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: #0589ff;" text="Delete Cargo" textFill="WHITE">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
                      </children>
                   </AnchorPane>
                </right>
@@ -202,6 +177,25 @@
                         <Button layoutX="135.0" layoutY="69.0" mnemonicParsing="false" onAction="#setOrderToCurrentUser" prefHeight="60.0" prefWidth="130.0" style="-fx-background-color: White;" text="Assign Order">
                            <font>
                               <Font size="16.0" />
+                           </font>
+                        </Button>
+                        <TextField fx:id="checkpointField" layoutX="45.0" layoutY="181.0" prefHeight="35.0" prefWidth="180.0" promptText="Checkpoint" />
+                        <Button fx:id="addCheckpointButton" layoutX="265.0" layoutY="216.0" mnemonicParsing="false" onAction="#addCheckpointToOrder" prefHeight="35.0" prefWidth="60.0" style="-fx-background-color: white;" text="Add">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Button>
+                        <ChoiceBox fx:id="trucksChoiceBoxOrders" layoutX="45.0" layoutY="332.0" prefHeight="35.0" prefWidth="180.0" />
+                        <Button layoutX="246.0" layoutY="332.0" mnemonicParsing="false" onAction="#assignTruckToOrder" prefHeight="35.0" prefWidth="140.0" style="-fx-background-color: white;" text="Assign Truck">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Button>
+                        <DatePicker fx:id="checkpointDate" layoutX="48.0" layoutY="247.0" prefHeight="35.0" prefWidth="180.0" />
+                        <ChoiceBox fx:id="managerChoiceBoxOrders" layoutX="48.0" layoutY="407.0" prefHeight="35.0" prefWidth="180.0" />
+                        <Button layoutX="246.0" layoutY="407.0" mnemonicParsing="false" onAction="#assignManagerToOrder" prefHeight="35.0" prefWidth="140.0" style="-fx-background-color: white;" text="Assign Manager">
+                           <font>
+                              <Font size="14.0" />
                            </font>
                         </Button>
                      </children></AnchorPane>

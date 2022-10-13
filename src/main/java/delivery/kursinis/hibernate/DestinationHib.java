@@ -1,5 +1,6 @@
 package delivery.kursinis.hibernate;
 
+import delivery.kursinis.model.Courier;
 import delivery.kursinis.model.Destination;
 import delivery.kursinis.model.Truck;
 import delivery.kursinis.model.User;
@@ -7,7 +8,9 @@ import delivery.kursinis.model.User;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +31,18 @@ public class DestinationHib {
             e.printStackTrace();
         }
     }
+    public void updateDestination(Destination destination){
+        entityManager = entityManagerFactory.createEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.merge(destination);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (entityManager != null) entityManager.close();
+        }
+    }
     public List getAllDestinations(){
         entityManager = entityManagerFactory.createEntityManager();
         try {
@@ -42,5 +57,18 @@ public class DestinationHib {
                 entityManager.close();
         }
         return new ArrayList<Destination>();
+    }
+
+    public void removeDestination(Destination destination){
+        entityManager = entityManagerFactory.createEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.remove(entityManager.contains(destination) ? destination : entityManager.merge(destination));
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (entityManager != null) entityManager.close();
+        }
     }
 }
