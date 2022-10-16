@@ -20,30 +20,20 @@ public class Destination {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private int id;
-
     private String address;
-
     private LocalDate requestedDeliveryDate;
-
-
     private LocalDate deliveryStartDate;
 
     private LocalDate deliveryEndDate;
-
     private OrderStatus status;
-
     @ManyToMany
     private List<Manager> managers;
-
     @ManyToMany
     private List<Cargo> cargos;
-
     @ManyToMany
     private List<Checkpoint> checkpoints;
-
     @ManyToOne
     private Courier courier;
-
     @OneToOne
     private Truck truck;
 

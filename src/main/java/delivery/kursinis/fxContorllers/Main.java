@@ -20,6 +20,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 
 import javax.persistence.EntityManagerFactory;
@@ -53,6 +54,7 @@ public class Main implements Initializable {
     public Button removeUserButton;
     @FXML
     public Button accountActionButton;
+    public ListView<Destination> allOrdersListForum;
     @FXML
     ChoiceBox<String> userTypeChoiceBox;
     @FXML
@@ -118,9 +120,9 @@ public class Main implements Initializable {
 
     public Tab ordersTab;
 
-    public ListView assignedOrdersList;
+    public ListView<Destination> assignedOrdersList;
 
-    public ListView allOrdersList;
+    public ListView<Destination> allOrdersList;
 
     @FXML
     public ChoiceBox trucksChoiceBoxOrders;
@@ -156,11 +158,18 @@ public class Main implements Initializable {
     public Button profileActionButtonApplyChanges;
 
 
+    //TODO: Forum
+    public MenuItem deleteItemFromForum;
+    public MenuItem updateItemInForum;
+    public TreeView commentTree;
+
+    //---
     private EntityManagerFactory entityManagerFactory;
     private User user;
     private UserHib userHib;
     private TruckHib truckHib;
     private DestinationHib destinationHib;
+    private CommentHib commentHib;
 
     private CheckpointHib checkpointHib;
     private String[] checkBoxValues = {"Courier", "Manager", "Admin Manager"};
@@ -182,6 +191,7 @@ public class Main implements Initializable {
         this.destinationHib = new DestinationHib(this.entityManagerFactory);
         this.cargoHib = new CargoHib(this.entityManagerFactory);
         this.checkpointHib = new CheckpointHib(this.entityManagerFactory);
+        this.commentHib = new CommentHib(this.entityManagerFactory);
 
 
         List<Truck> allTrucks = truckHib.getAllTrucks();
@@ -686,10 +696,12 @@ public class Main implements Initializable {
 
     private void fillAllDestinations() {
         allOrdersList.getItems().clear();
+        allOrdersListForum.getItems().clear();
         assignedOrdersList.getItems().clear();
         List<Destination> allDestinations = destinationHib.getAllDestinations();
         for (Destination destination : allDestinations) {
             allOrdersList.getItems().add(destination);
+            allOrdersListForum.getItems().add(destination);
             if (destination.getCourier() != null && destination.getCourier().getId() == user.getId()) {
                 assignedOrdersList.getItems().add(destination);
             }
@@ -743,5 +755,20 @@ public class Main implements Initializable {
                 medicalCertificate.setDisable(true);
                 break;
         }
+    }
+
+    public void deleteComment() {
+    }
+
+    public void updateComment() {
+    }
+
+    public void createComment() {
+        commentHib.createComment(new Comment("Title", "Text"));
+    }
+
+    public void loadComments() {
+
+//        List<Comment> comments = destinationHib.getDestinationByID(allOrdersListForum.getSelectionModel().getSelectedItem().getId());
     }
 }

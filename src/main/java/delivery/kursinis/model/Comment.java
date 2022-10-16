@@ -25,7 +25,13 @@ public class Comment {
 
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> replies;
-
     @ManyToOne
     private Comment parentComment;
+    @ManyToOne
+    private Destination parentDestination;
+
+    public Comment(String title, String commentText) {
+        this.title = title;
+        this.commentText = commentText;
+    }
 }
