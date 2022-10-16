@@ -2,6 +2,7 @@ package delivery.kursinis.utils;
 
 import delivery.kursinis.Enums.OrderStatus;
 import delivery.kursinis.model.Cargo;
+import delivery.kursinis.model.Destination;
 import javafx.scene.control.Alert;
 
 import java.time.LocalDate;
@@ -37,6 +38,9 @@ public class FxUtils {
     }
     public boolean areDestinationFieldsFilled(String address, LocalDate requestedDeliveryDate, LocalDate currentDay, OrderStatus status){
         return address.isEmpty() || requestedDeliveryDate == null || currentDay == null || status == null;
+    }
+    public boolean areForumFieldsFilled(String title, String description, Destination destination){
+        return title.isEmpty() || description == null || description == null;
     }
     public boolean isPositiveInteger(String text){
         int number;

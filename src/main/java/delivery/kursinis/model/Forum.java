@@ -24,4 +24,20 @@ public class Forum {
 
     @OneToMany (mappedBy = "forum", cascade = CascadeType.ALL)
     private List<Comment> comments;
+
+    @ManyToOne
+    private Destination destination;
+
+    public Forum(String forumTitle, String forumDescription, Destination destination) {
+        this.forumTitle = forumTitle;
+        this.forumDescription = forumDescription;
+        this.destination = destination;
+    }
+
+    @Override
+    public String toString() {
+        return forumTitle +
+                ", " + forumDescription +
+                ", Destination=" + destination;
+    }
 }

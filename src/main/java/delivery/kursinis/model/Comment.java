@@ -28,10 +28,16 @@ public class Comment {
     @ManyToOne
     private Comment parentComment;
     @ManyToOne
-    private Destination parentDestination;
+    private Forum parentForum;
 
-    public Comment(String title, String commentText) {
+    public Comment(String title, String commentText, Forum parentForum) {
         this.title = title;
         this.commentText = commentText;
+        this.parentForum = parentForum;
+    }
+    public Comment(String title, String commentText, Comment parentComment) {
+        this.title = title;
+        this.commentText = commentText;
+        this.parentComment = parentComment;
     }
 }

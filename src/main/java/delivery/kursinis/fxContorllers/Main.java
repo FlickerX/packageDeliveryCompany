@@ -54,7 +54,9 @@ public class Main implements Initializable {
     public Button removeUserButton;
     @FXML
     public Button accountActionButton;
-    public ListView<Destination> allOrdersListForum;
+    public TextField commentTitle;
+    public TextField commentText;
+    public Button commentActionButton;
     @FXML
     ChoiceBox<String> userTypeChoiceBox;
     @FXML
@@ -163,6 +165,12 @@ public class Main implements Initializable {
     public MenuItem updateItemInForum;
     public TreeView commentTree;
 
+    public TextField forumTitle;
+    public TextField forumDescription;
+    public ChoiceBox ordersChoiceBoxForum;
+    public Button forumActionButton;
+
+    public ListView<Forum> allForumsList;
     //---
     private EntityManagerFactory entityManagerFactory;
     private User user;
@@ -170,6 +178,7 @@ public class Main implements Initializable {
     private TruckHib truckHib;
     private DestinationHib destinationHib;
     private CommentHib commentHib;
+    private ForumHib forumHib;
 
     private CheckpointHib checkpointHib;
     private String[] checkBoxValues = {"Courier", "Manager", "Admin Manager"};
@@ -192,6 +201,7 @@ public class Main implements Initializable {
         this.cargoHib = new CargoHib(this.entityManagerFactory);
         this.checkpointHib = new CheckpointHib(this.entityManagerFactory);
         this.commentHib = new CommentHib(this.entityManagerFactory);
+        this.forumHib = new ForumHib(this.entityManagerFactory);
 
 
         List<Truck> allTrucks = truckHib.getAllTrucks();
@@ -229,7 +239,7 @@ public class Main implements Initializable {
         fillCargosLists();
         fillAllDestinations();
         fillAllCheckpoints();
-
+        fillForumLists();
         setSelectionModes();
     }
 
@@ -467,7 +477,7 @@ public class Main implements Initializable {
         int id = ((Destination) allOrdersList.getSelectionModel().getSelectedItem()).getId();
         Destination destination = destinationHib.getDestinationByID(id);
         if (destination.getCourier() != null && user.getClass() == Courier.class)
-            fxUtils.alertMessage(Alert.AlertType.ERROR, "Setting completed", "Error", "There is already assigned Courier to order");
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Type Error", "Error", "There is already assigned Courier to order");
 
         else if (user.getClass() == Courier.class && destination.getCourier() == null) {
             Courier courier = userHib.getCourierByID(user.getId());
@@ -489,6 +499,16 @@ public class Main implements Initializable {
                 manager.getDestinations().add(destination);
                 destinationHib.updateDestination(destination); //TODO: Maybe it work with managers array
             }
+        }
+        fillAssignedOrders();
+    }
+
+    private void fillAssignedOrders(){
+        assignedOrdersList.getItems().clear();
+        List<Destination> allDestinations = destinationHib.getAllDestinations();
+        for (Destination destination : allDestinations){
+            if (destination.getCourier().getId() == user.getId()) //TODO: Make it  work with managers
+                assignedOrdersList.getItems().add(destination);
         }
     }
 
@@ -696,12 +716,12 @@ public class Main implements Initializable {
 
     private void fillAllDestinations() {
         allOrdersList.getItems().clear();
-        allOrdersListForum.getItems().clear();
         assignedOrdersList.getItems().clear();
+        ordersChoiceBoxForum.getItems().clear();
         List<Destination> allDestinations = destinationHib.getAllDestinations();
         for (Destination destination : allDestinations) {
             allOrdersList.getItems().add(destination);
-            allOrdersListForum.getItems().add(destination);
+            ordersChoiceBoxForum.getItems().add(destination);
             if (destination.getCourier() != null && destination.getCourier().getId() == user.getId()) {
                 assignedOrdersList.getItems().add(destination);
             }
@@ -731,16 +751,29 @@ public class Main implements Initializable {
 
     private void fillCourierLists() {
         courierList.getItems().clear();
+        couriersChoiceBox.getItems().clear();
         List<Courier> allCouriers = userHib.getAllCouriers();
-        for (Courier courier : allCouriers)
+        for (Courier courier : allCouriers){
             courierList.getItems().add(courier);
+            couriersChoiceBox.getItems().add(courier);
+        }
+
     }
 
     private void fillTruckLists() {
         truckList.getItems().clear();
+        trucksChoiceBox.getItems().clear();
         List<Truck> allTrucks = truckHib.getAllTrucks();
-        for (Truck truck : allTrucks)
+        for (Truck truck : allTrucks){
             truckList.getItems().add(truck);
+            trucksChoiceBox.getItems().add(truck);
+        }
+    }
+    private void fillForumLists(){
+        allForumsList.getItems().clear();
+        List<Forum> allForums = forumHib.getAllForums();
+        for (Forum forum : allForums)
+            allForumsList.getItems().add(forum);
     }
 
     public void hideFields(String choiceBoxValue) {
@@ -764,11 +797,35 @@ public class Main implements Initializable {
     }
 
     public void createComment() {
-        commentHib.createComment(new Comment("Title", "Text"));
+        Forum forum = allForumsList.getSelectionModel().getSelectedItem();
+        Comment comment = new Comment(commentTitle.getText(), commentText.getText(), forum);
+        commentHib.createComment(comment);
     }
 
     public void loadComments() {
+        Forum forum = allForumsList.getSelectionModel().getSelectedItem();
+        List<Comment> comments = forumHib.getForumByID(forum.getId()).getComments();
+        commentTree.setRoot(new TreeItem(new Comment()));
+        commentTree.setShowRoot(false);
+        commentTree.getRoot().setExpanded(true);
+        comments.forEach(comment -> addTreeItem(comment, commentTree.getRoot()));
+//        commentTree.setRoot(new TreeItem<String>("All comments from forum"));
+//        List<Comment> comments = forumHib.getForumByID(forumID);
+    }
+    private void addTreeItem(Comment comment, TreeItem parent){
+        TreeItem<Comment> treeItem = new TreeItem<Comment>(comment);
+        parent.getChildren().add(treeItem);
+        comment.getReplies().forEach(r -> addTreeItem(r, treeItem));
+    }
 
-//        List<Comment> comments = destinationHib.getDestinationByID(allOrdersListForum.getSelectionModel().getSelectedItem().getId());
+    public void createForum() {
+        Destination destination = (Destination) ordersChoiceBoxForum.getValue();
+        if (fxUtils.areForumFieldsFilled(forumTitle.getId(), forumDescription.getText(),destination))
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Creation Error", "", "All fields must be filled");
+        else{
+            Forum forum = new Forum(forumTitle.getText(), forumDescription.getText(), destination);
+            forumHib.createForum(forum);
+            fillForumLists();
+        }
     }
 }
