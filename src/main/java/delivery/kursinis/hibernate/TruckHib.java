@@ -1,5 +1,6 @@
 package delivery.kursinis.hibernate;
 
+import delivery.kursinis.model.Courier;
 import delivery.kursinis.model.Destination;
 import delivery.kursinis.model.Truck;
 import delivery.kursinis.model.User;
@@ -54,6 +55,18 @@ public class TruckHib {
         }finally {
             if (entityManager != null) entityManager.close();
         }
+    }
+    public Truck getTruckByID(int id){
+        entityManager = entityManagerFactory.createEntityManager();
+        Truck truck = null;
+        try{
+            entityManager.getTransaction().begin();
+            truck = entityManager.find(Truck.class, id);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            System.out.println("No such user");
+        }
+        return truck;
     }
     public void removeTruck(Truck truck){
         entityManager = entityManagerFactory.createEntityManager();

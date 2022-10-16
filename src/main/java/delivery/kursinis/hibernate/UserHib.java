@@ -47,6 +47,18 @@ public class UserHib {
             if (entityManager != null) entityManager.close();
         }
     }
+    public void updateCourier(Courier courier){
+        entityManager = entityManagerFactory.createEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.merge(courier);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (entityManager != null) entityManager.close();
+        }
+    }
 
     public void removeUser(User user){
         entityManager = entityManagerFactory.createEntityManager();
@@ -60,9 +72,6 @@ public class UserHib {
             if (entityManager != null) entityManager.close();
         }
     }
-
-
-    //TODO: Make filters here for user
 
     public User getUserByID(int id){
         entityManager = entityManagerFactory.createEntityManager();

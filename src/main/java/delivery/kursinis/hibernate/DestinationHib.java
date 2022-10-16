@@ -59,6 +59,19 @@ public class DestinationHib {
         return new ArrayList<Destination>();
     }
 
+    public Destination getDestinationByID(int id){
+        entityManager = entityManagerFactory.createEntityManager();
+        Destination destination = null;
+        try{
+            entityManager.getTransaction().begin();
+            destination = entityManager.find(Destination.class, id);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            System.out.println("No such user");
+        }
+        return destination;
+    }
+
     public void removeDestination(Destination destination){
         entityManager = entityManagerFactory.createEntityManager();
         try{

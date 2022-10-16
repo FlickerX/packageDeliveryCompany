@@ -45,6 +45,18 @@ public class CargoHib {
         }
         return new ArrayList<Cargo>();
     }
+    public void updateCargo(Cargo cargo){
+        entityManager = entityManagerFactory.createEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.merge(cargo);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (entityManager != null) entityManager.close();
+        }
+    }
     public void removeCargo(Cargo cargo){
         entityManager = entityManagerFactory.createEntityManager();
         try{

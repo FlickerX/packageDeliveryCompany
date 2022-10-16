@@ -57,4 +57,28 @@ public class CheckpointHib {
         }
         return new ArrayList<Checkpoint>();
     }
+    public Checkpoint getCheckpointByID(int id){
+        entityManager = entityManagerFactory.createEntityManager();
+        Checkpoint checkpoint = null;
+        try{
+            entityManager.getTransaction().begin();
+            checkpoint = entityManager.find(Checkpoint.class, id);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            System.out.println("No such user");
+        }
+        return checkpoint;
+    }
+    public void removeCheckpoint(Checkpoint checkpoint){
+        entityManager = entityManagerFactory.createEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.remove(entityManager.contains(checkpoint) ? checkpoint : entityManager.merge(checkpoint));
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (entityManager != null) entityManager.close();
+        }
+    }
 }

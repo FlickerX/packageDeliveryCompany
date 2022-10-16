@@ -33,7 +33,7 @@ public class Destination {
     private OrderStatus status;
 
     @ManyToMany
-    private List<Manager> managers; //TODO: Make it work
+    private List<Manager> managers;
 
     @ManyToMany
     private List<Cargo> cargos;
@@ -58,13 +58,14 @@ public class Destination {
         this.truck = truck;
     }
 
-    public Destination(String address, LocalDate requestedDeliveryDate, LocalDate deliveryStartDate, OrderStatus status, List<Manager> managers, List<Cargo> cargos) {
+    public Destination(String address, LocalDate requestedDeliveryDate, LocalDate deliveryStartDate, OrderStatus status, List<Manager> managers, List<Cargo> cargos, Truck truck) {
         this.address = address;
         this.requestedDeliveryDate = requestedDeliveryDate;
         this.deliveryStartDate = deliveryStartDate;
         this.status = status;
         this.managers = managers;
         this.cargos = cargos;
+        this.truck = truck;
     }
 
     @Override
@@ -74,9 +75,5 @@ public class Destination {
                 " " + status +
                 ", courier=" + courier +
                 ", truck=" + truck;
-    }
-
-    public void setManagers(Manager manager) {
-        this.managers.add(manager);
     }
 }
