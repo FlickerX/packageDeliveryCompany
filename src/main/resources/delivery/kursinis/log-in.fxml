@@ -25,7 +25,10 @@
          <TextField fx:id="loginField" layoutX="213.0" layoutY="175.0" prefHeight="50.0" prefWidth="240.0" promptText="Login" style="-fx-background-color: transparent; -fx-border-color: #0589ff; -fx-border-width: 0 0 2px 0;" />
          <PasswordField fx:id="passwordField" layoutX="213.0" layoutY="282.0" prefHeight="50.0" prefWidth="240.0" promptText="Password" style="-fx-background-color: transparent; -fx-border-color: #0589ff; -fx-border-width: 0 0 2px 0;" />
          <Button fx:id="login_btn" layoutX="288.0" layoutY="460.0" mnemonicParsing="false" onAction="#login" prefHeight="50.0" prefWidth="89.0" style="-fx-background-color: #0589ff;" text="Log in" textFill="WHITE" />
-         <CheckBox fx:id="isManagerCheckbox" layoutX="274.0" layoutY="388.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #0589ff;" text="Manager" />
+         <CheckBox fx:id="isManagerCheckbox" layoutX="262.0" layoutY="378.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="141.0" text="Manager">
+            <font>
+               <Font size="18.0" />
+            </font></CheckBox>
       </AnchorPane>
    </right>
 </BorderPane>

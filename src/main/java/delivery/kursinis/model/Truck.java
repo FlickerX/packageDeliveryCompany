@@ -22,9 +22,7 @@ public class Truck {
     private Double engineLiters;
     private Integer horsePower;
     private String color;
-
     private Boolean isAvailable;
-
     @OneToOne
     private Destination destination;
 

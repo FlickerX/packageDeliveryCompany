@@ -31,10 +31,9 @@ public class LoginPage {
     public Button login_btn;
     @FXML
     public CheckBox isManagerCheckbox;
-    EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("PackageDeliveryCompany");
-    UserHib userHib = new UserHib(entityManagerFactory);
-
-    FxUtils fxUtils = new FxUtils();
+    private EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("PackageDeliveryCompany");
+    private UserHib userHib = new UserHib(entityManagerFactory);
+    private FxUtils fxUtils = new FxUtils();
 
     public void login() throws IOException {
         User user = userHib.getUserByLoginData(loginField.getText(), passwordField.getText(), isManagerCheckbox.isSelected());
@@ -47,17 +46,14 @@ public class LoginPage {
     }
 
     private void openMainWindow(User user) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("main.fxml")); // TODO: Maybe here wrong 6 tutorial -29
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("main.fxml"));
         Parent parent = fxmlLoader.load();
         Main mainPage = fxmlLoader.getController();
         mainPage.setData(entityManagerFactory, user);
         Scene scene = new Scene(parent);
-        Stage stage = (Stage) loginField.getScene().getWindow(); // Open in this window
+        Stage stage = (Stage) loginField.getScene().getWindow();
         stage.setTitle("Package Delivery Company");
         stage.setScene(scene);
         stage.show();
-    }
-
-    public void register() {
     }
 }

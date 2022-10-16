@@ -69,4 +69,16 @@ public class ForumHib {
         }
         return forum;
     }
+    public void deleteForum(Forum forum){
+        entityManager = entityManagerFactory.createEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.remove(forum);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (entityManager != null) entityManager.close();
+        }
+    }
 }

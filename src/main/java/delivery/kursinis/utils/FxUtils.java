@@ -46,10 +46,13 @@ public class FxUtils {
         int number;
         try{
             number = Integer.parseInt(text);
-            if (number < 0)
+            if (number < 0){
                 alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field can't be negative");
+                return false;
+            }
         } catch (NumberFormatException e){
             alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field is not Integer type");
+            return false;
         }
         return true;
     }
@@ -57,10 +60,14 @@ public class FxUtils {
         double number;
         try{
             number = Double.parseDouble(text);
-            if (number < 0)
+            if (number < 0){
                 alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field can't be negative");
+                return false;
+            }
+
         } catch (NumberFormatException e){
             alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field is not Double type");
+            return false;
         }
         return true;
     }

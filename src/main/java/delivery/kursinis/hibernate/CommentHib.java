@@ -1,6 +1,7 @@
 package delivery.kursinis.hibernate;
 
 import delivery.kursinis.model.Comment;
+import delivery.kursinis.model.Forum;
 import delivery.kursinis.model.Manager;
 import delivery.kursinis.model.User;
 
@@ -42,7 +43,7 @@ public class CommentHib {
             if (entityManager != null) entityManager.close();
         }
     }
-    public void deleteUser(Comment comment){
+    public void deleteComment(Comment comment){
         entityManager = entityManagerFactory.createEntityManager();
         try{
             entityManager.getTransaction().begin();
@@ -65,5 +66,20 @@ public class CommentHib {
             System.out.println("No such comment");
         }
         return comment;
+    }
+    public List<Comment> getAllComments(){
+        entityManager = entityManagerFactory.createEntityManager();
+        try {
+            CriteriaQuery<Object> query = entityManager.getCriteriaBuilder().createQuery();
+            query.select(query.from(Comment.class));
+            Query q = entityManager.createQuery(query);
+            return q.getResultList();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if (entityManager != null)
+                entityManager.close();
+        }
+        return new ArrayList<Comment>();
     }
 }

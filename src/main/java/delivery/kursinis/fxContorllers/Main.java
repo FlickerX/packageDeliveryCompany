@@ -1,39 +1,16 @@
 package delivery.kursinis.fxContorllers;
 
 import delivery.kursinis.Enums.OrderStatus;
-import delivery.kursinis.HelloApplication;
 import delivery.kursinis.hibernate.*;
 import delivery.kursinis.model.*;
-import delivery.kursinis.utils.DatabaseOperations;
 import delivery.kursinis.utils.FxUtils;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.InputMethodEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
 
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.persistence.Query;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,14 +26,11 @@ public class Main implements Initializable {
     @FXML
     public Tab registerUserTab;
     @FXML
-    public Button updateUserButton;
-    @FXML
-    public Button removeUserButton;
-    @FXML
     public Button accountActionButton;
+    @FXML
     public TextField commentTitle;
+    @FXML
     public TextField commentText;
-    public Button commentActionButton;
     @FXML
     ChoiceBox<String> userTypeChoiceBox;
     @FXML
@@ -95,8 +69,7 @@ public class Main implements Initializable {
     public ListView<Truck> truckList;
     @FXML
     public Tab orderManagementTab;
-
-    //TODO: Cargos
+    //Cargos
     @FXML
     public Tab cargoManagementTab;
     @FXML
@@ -105,73 +78,94 @@ public class Main implements Initializable {
     public TextField cargoWeight;
     @FXML
     public ListView<Cargo> cargoList;
-
+    @FXML
     public Button cargoActionButton;
+    @FXML
     CargoHib cargoHib;
-    //--------------------------
-
-    //TODO: Orders
+    @FXML
     public ListView<Manager> managersOrderList;
+    @FXML
     public ListView<Cargo> cargosOrderList;
+    @FXML
     public TextField destinationAddress;
+    @FXML
     public DatePicker destinationRequestedDeliveryDate;
     @FXML
     public ChoiceBox trucksChoiceBox;
+    @FXML
     public ChoiceBox couriersChoiceBox;
-
-
+    @FXML
+    public Button assignOrderButton;
+    @FXML
     public Tab ordersTab;
-
+    @FXML
     public ListView<Destination> assignedOrdersList;
-
+    @FXML
     public ListView<Destination> allOrdersList;
-
     @FXML
     public ChoiceBox trucksChoiceBoxOrders;
     @FXML
-    public TextField checkpointField;
-    @FXML
-    public Button addCheckpointButton;
-    @FXML
-    public DatePicker checkpointDate;
-    @FXML
     public ChoiceBox managerChoiceBoxOrders;
-    //-----------------
-
-    // TODO: Checkpoints
+    @FXML
+    public TextField orderAddress;
+    @FXML
+    public DatePicker orderDeliveryDate;
+    @FXML
+    public MenuItem updateOrderMenuItem;
+    @FXML
+    public MenuItem deleteOrderMenuItem;
+    @FXML
+    public Button orderActionButton;
+    @FXML
     public TextField checkpointAddress;
+    @FXML
     public DatePicker checkpointDateTab;
+    @FXML
     public ListView<Checkpoint> checkpointsList;
+    @FXML
     public ChoiceBox checkpointsChoiceBoxOrders;
+    @FXML
     public Button checkpointActionButton;
-
-
-    //TODO: Profile
+    //Profile
+    @FXML
     public TextField profileUsername;
+    @FXML
     public TextField profileName;
+    @FXML
     public TextField profileSurname;
+    @FXML
     public TextField profilePhoneNo;
+    @FXML
     public TextField profileDriverLicense;
+    @FXML
     public TextField profileMedicalCertificate;
+    @FXML
     public PasswordField profilePassword;
-
+    @FXML
     public Button profileActionButton;
+    @FXML
     public DatePicker profileBirthday;
+    @FXML
     public Button profileActionButtonApplyChanges;
-
-
-    //TODO: Forum
-    public MenuItem deleteItemFromForum;
+    //Forum
+    @FXML
     public MenuItem updateItemInForum;
-    public TreeView commentTree;
-
+    @FXML
+    public TreeView<Comment> commentTree = new TreeView<Comment>();
+    @FXML
     public TextField forumTitle;
+    @FXML
     public TextField forumDescription;
+    @FXML
     public ChoiceBox ordersChoiceBoxForum;
+    @FXML
     public Button forumActionButton;
-
+    @FXML
     public ListView<Forum> allForumsList;
-    //---
+    @FXML
+    public Button updateCommentButton;
+    @FXML
+    public Tab forumTab;
     private EntityManagerFactory entityManagerFactory;
     private User user;
     private UserHib userHib;
@@ -179,10 +173,8 @@ public class Main implements Initializable {
     private DestinationHib destinationHib;
     private CommentHib commentHib;
     private ForumHib forumHib;
-
     private CheckpointHib checkpointHib;
     private String[] checkBoxValues = {"Courier", "Manager", "Admin Manager"};
-
     private FxUtils fxUtils = new FxUtils();
 
 
@@ -229,7 +221,13 @@ public class Main implements Initializable {
             allTabs.getTabs().remove(registerUserTab);
             allTabs.getTabs().remove(orderManagementTab);
             allTabs.getTabs().remove(cargoManagementTab);
+            deleteOrderMenuItem.setVisible(false);
+            updateOrderMenuItem.setVisible(false);
         }
+        orderActionButton.setVisible(false);
+        updateCommentButton.setVisible(false);
+        orderAddress.setVisible(false);
+        orderDeliveryDate.setVisible(false);
     }
 
     private void fillAllLists() {
@@ -246,39 +244,61 @@ public class Main implements Initializable {
     public void createUserByAdmin() {
         if (userTypeChoiceBox.getValue() == null)
             fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "You have to specify user type!");
-        switch (userTypeChoiceBox.getValue()) {
-            case "Courier":
-                Courier courier = null;
-                if (fxUtils.areAllCourierFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(), phoneNumber.getText(), salary.getText(),
-                        driverLicense.getText(), medicalCertificate.getText(), birthday.getValue()))
-                    fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "All fields has to be filled");
+        else
+            switch (userTypeChoiceBox.getValue()) {
+                case "Courier":
+                    Courier courier = null;
+                    if (fxUtils.areAllCourierFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(), phoneNumber.getText(), salary.getText(),
+                            driverLicense.getText(), medicalCertificate.getText(), birthday.getValue())){
+                        fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "All fields has to be filled");
+                        break;
+                    }
 
-                courier = new Courier(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(), phoneNumber.getText(),
-                        Double.parseDouble(salary.getText()),
-                        driverLicense.getText(), medicalCertificate.getText());
-                userHib.createUser(courier);
-                fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Courier Creation Status", "", "Courier was created");
-                fillCourierLists();
-                break;
 
-            case "Manager":
-            case "Admin Manager":
-                Manager manager = null;
-                if (fxUtils.areAllManagerFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(), phoneNumber.getText(), salary.getText(),
-                        birthday.getValue()))
-                    fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "All fields has to be filled");
-                if (userTypeChoiceBox.getValue().equals("Manager")) {
-                    manager = new Manager(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
-                            phoneNumber.getText(), Double.parseDouble(salary.getText()), false); // TODO: Make double validation
-                } else {
-                    manager = new Manager(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
-                            phoneNumber.getText(), Double.parseDouble(salary.getText()), true); // TODO: Make double validation
-                }
-                userHib.createUser(manager);
-                fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Manager Creation Status", "", "Manager was created");
-                fillManagersLists();
-                break;
-        }
+                    else if (!fxUtils.isPositiveDouble(salary.getText())){
+                        fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "Wrong type, type has to be double");
+                        break;
+                    }
+
+
+                    else {
+                        courier = new Courier(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(), phoneNumber.getText(),
+                                Double.parseDouble(salary.getText()),
+                                driverLicense.getText(), medicalCertificate.getText());
+                        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Courier Creation Status", "", "Courier was created");
+                    }
+                    userHib.createUser(courier);
+                    fillCourierLists();
+                    break;
+
+                case "Manager":
+                case "Admin Manager":
+                    Manager manager = null;
+                    if (fxUtils.areAllManagerFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(), phoneNumber.getText(), salary.getText(),
+                            birthday.getValue())){
+                        fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "All fields has to be filled");
+                        break;
+                    }
+
+
+                    else if (!fxUtils.isPositiveDouble(salary.getText())){
+                        fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "Wrong type, type has to be double");
+                        break;
+                    }
+
+
+                    else if (userTypeChoiceBox.getValue().equals("Manager")) {
+                        manager = new Manager(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
+                                phoneNumber.getText(), Double.parseDouble(salary.getText()), false);
+                    } else {
+                        manager = new Manager(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
+                                phoneNumber.getText(), Double.parseDouble(salary.getText()), true);
+                        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Manager Creation Status", "", "Manager was created");
+                    }
+                    userHib.createUser(manager);
+                    fillManagersLists();
+                    break;
+            }
     }
 
     public void updateUserData() {
@@ -286,7 +306,7 @@ public class Main implements Initializable {
         fillUserFields();
     }
 
-    private void fillUserFields() { // TODO: I need to refactor this
+    private void fillUserFields() {
         if (managerList.getSelectionModel().getSelectedItem() != null) {
             Manager manager = managerList.getSelectionModel().getSelectedItem();
             if (manager.isAdmin()) {
@@ -357,18 +377,22 @@ public class Main implements Initializable {
         User user1 = courierList.getSelectionModel().getSelectedItem();
         userHib.removeUser(user1);
         fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "User was successfully deleted");
+        fillManagersLists();
+        fillCourierLists();
     }
 
     public void createTruck() {
-        if (fxUtils.isPositiveInteger(horsePower.getText()) && fxUtils.isPositiveDouble(engineLiters.getText()) &&
-                !fxUtils.areAllTruckFieldsFilled(mark.getText(), model.getText(), horsePower.getText(), engineLiters.getText(), color.getText())) {
+        if (!fxUtils.isPositiveInteger(horsePower.getText()) || !fxUtils.isPositiveDouble(engineLiters.getText()) ||
+                fxUtils.areAllTruckFieldsFilled(mark.getText(), model.getText(), horsePower.getText(), engineLiters.getText(), color.getText())){
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Truck creating warning", "Validation error", "All fields has to be filled");
+        }
+        else{
             Truck truck = new Truck(mark.getText(), model.getText(), Double.parseDouble(engineLiters.getText()), Integer.parseInt(horsePower.getText()),
                     color.getText());
             truckHib.createTruck(truck);
             fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Truck Creation Status", "", "Truck was created");
             fillTruckLists();
-        } else {
-            fxUtils.alertMessage(Alert.AlertType.ERROR, "Truck creating warning", "Validation error", "All fields has to be filled");
+            resetTruckTab();
         }
     }
 
@@ -407,20 +431,21 @@ public class Main implements Initializable {
         Truck truck = truckList.getSelectionModel().getSelectedItem();
         truckHib.removeTruck(truck);
         fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "Truck was successfully deleted");
+        fillTruckLists();
     }
 
     public void createCargo() {
-        if (fxUtils.isPositiveDouble(cargoWeight.getText()) && !fxUtils.areCargoFieldsFilled(cargoNaming.getText(), cargoWeight.getText())) {
+        if (!fxUtils.isPositiveDouble(cargoWeight.getText()) || fxUtils.areCargoFieldsFilled(cargoNaming.getText(), cargoWeight.getText())) {
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Field Input Error", "Typing Error", "All fields has to be filled");
+        } else {
             Cargo cargo = new Cargo(cargoNaming.getText(), Double.parseDouble(cargoWeight.getText()));
             cargoHib.createCargo(cargo);
             fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Cargo Creation Status", "", "Cargo was created");
             fillCargosLists();
-        } else {
-            fxUtils.alertMessage(Alert.AlertType.ERROR, "Field Input Error", "Typing Error", "All fields has to be filled");
         }
     }
 
-    public void updateCargoData() { // TODO: Make functionlity
+    public void updateCargoData() {
         cargoActionButton.setText("Update Cargo");
         fillCargoFields();
     }
@@ -447,6 +472,7 @@ public class Main implements Initializable {
         Cargo cargo = cargoList.getSelectionModel().getSelectedItem();
         cargoHib.removeCargo(cargo);
         fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "Cargo was successfully deleted");
+        fillCargosLists();
     }
 
     public void createOrder() {
@@ -488,7 +514,7 @@ public class Main implements Initializable {
             List<Manager> destinationManagers = destination.getManagers();
 
             boolean insertValues = true;
-            for (Manager man : destinationManagers) // With contains doesnt work
+            for (Manager man : destinationManagers)
                 if (man.getId() == manager.getId()) {
                     fxUtils.alertMessage(Alert.AlertType.ERROR, "Manager assign error", "Assigning error", "This Manager has been already assigned to this order");
                     insertValues = false;
@@ -497,26 +523,27 @@ public class Main implements Initializable {
             if (insertValues) {
                 destination.getManagers().add(manager);
                 manager.getDestinations().add(destination);
-                destinationHib.updateDestination(destination); //TODO: Maybe it work with managers array
+                destinationHib.updateDestination(destination);
             }
         }
         fillAssignedOrders();
     }
 
-    private void fillAssignedOrders(){
+    private void fillAssignedOrders() {
         assignedOrdersList.getItems().clear();
         List<Destination> allDestinations = destinationHib.getAllDestinations();
-        for (Destination destination : allDestinations){
-            if (destination.getCourier().getId() == user.getId()) //TODO: Make it  work with managers
+        for (Destination destination : allDestinations) {
+            if (destination.getCourier().getId() == user.getId())
                 assignedOrdersList.getItems().add(destination);
         }
     }
 
     public void assignTruckToOrder() {
         //TODO: Check if value from choiceBox is selected
-        Destination destination = (Destination) allOrdersList.getSelectionModel().getSelectedItem(); //TODO: Warning if truck is filleed
+        Destination destination = (Destination) allOrdersList.getSelectionModel().getSelectedItem();
         destination.setTruck((Truck) trucksChoiceBoxOrders.getValue());
         destinationHib.updateDestination(destination);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Assign Status", "", "Truck was successfully assigned to order");
     }
 
     public void addCheckpointToOrder() {
@@ -529,6 +556,7 @@ public class Main implements Initializable {
 
         destination.getCheckpoints().add(checkpoint);
         destinationHib.updateDestination(destination);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Assign Status", "", "Checkpoint was successfully added to order");
     }
 
     public void assignManagerToOrder() {
@@ -542,7 +570,7 @@ public class Main implements Initializable {
 
         List<Manager> destinationManagers = destination.getManagers();
         boolean insertValues = true;
-        for (Manager man : destinationManagers) // With contains doesnt work
+        for (Manager man : destinationManagers)
             if (man.getId() == manager.getId()) {
                 fxUtils.alertMessage(Alert.AlertType.ERROR, "Manager assign error", "Assigning error", "Manager has been already assigned to this order");
                 insertValues = false;
@@ -552,6 +580,7 @@ public class Main implements Initializable {
             destination.getManagers().add(manager);
             manager.getDestinations().add(destination);
             destinationHib.updateDestination(destination);
+            fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Assign Status", "", "Manager was successfully added to order");
         }
     }
 
@@ -570,6 +599,7 @@ public class Main implements Initializable {
         Checkpoint checkpoint = checkpointsList.getSelectionModel().getSelectedItem();
         checkpointHib.removeCheckpoint(checkpoint);
         fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "Cargo was successfully deleted");
+        fillAllCheckpoints();
     }
 
     public void updateCheckpointData() {
@@ -595,13 +625,13 @@ public class Main implements Initializable {
         resetCheckpointTab();
     }
 
-    private void resetCheckpointTab() { // TODO: Reset all tabs
+    private void resetCheckpointTab() {
         checkpointAddress.setText("");
         checkpointDateTab.setValue(null);
         checkpointActionButton.setText("Create Checkpoint");
     }
 
-    private void resetUserTab(){
+    private void resetUserTab() {
         username.setText("");
         password.setText("");
         name.setText("");
@@ -613,29 +643,36 @@ public class Main implements Initializable {
         medicalCertificate.setText("");
     }
 
-    private void resetTruckTab(){
+    private void resetTruckTab() {
         mark.setText("");
         model.setText("");
         horsePower.setText("");
         engineLiters.setText("");
         color.setText("");
     }
-    private void resetCargoTab(){
+
+    private void resetCargoTab() {
         cargoNaming.setText("");
         cargoWeight.setText("");
     }
-    private void resetProfileTab(){
-        profileUsername.setText("");
-        profilePassword.setText("");
-        profileName.setText("");
-        profileSurname.setText("");
-        profilePhoneNo.setText("+370");
+
+    private void resetProfileTab() {
+        profileUsername.setText(user.getLogin());
+        profilePassword.setText(user.getPassword());
+        profileName.setText(user.getName());
+        profileSurname.setText(user.getPassword());
+        profilePhoneNo.setText(user.getPhoneNo());
         profileDriverLicense.setText("");
         profileMedicalCertificate.setText("");
-        profileBirthday.setValue(null);
+        profileBirthday.setValue(user.getBirthday());
     }
 
-
+    private void resetForumTab() {
+        forumTitle.setText("");
+        forumDescription.setText("");
+        commentTitle.setText("");
+        commentText.setText("");
+    }
 
     public void updateProfileData() {
         setProfileFieldsNotEditable(true);
@@ -753,7 +790,7 @@ public class Main implements Initializable {
         courierList.getItems().clear();
         couriersChoiceBox.getItems().clear();
         List<Courier> allCouriers = userHib.getAllCouriers();
-        for (Courier courier : allCouriers){
+        for (Courier courier : allCouriers) {
             courierList.getItems().add(courier);
             couriersChoiceBox.getItems().add(courier);
         }
@@ -764,12 +801,13 @@ public class Main implements Initializable {
         truckList.getItems().clear();
         trucksChoiceBox.getItems().clear();
         List<Truck> allTrucks = truckHib.getAllTrucks();
-        for (Truck truck : allTrucks){
+        for (Truck truck : allTrucks) {
             truckList.getItems().add(truck);
             trucksChoiceBox.getItems().add(truck);
         }
     }
-    private void fillForumLists(){
+
+    private void fillForumLists() {
         allForumsList.getItems().clear();
         List<Forum> allForums = forumHib.getAllForums();
         for (Forum forum : allForums)
@@ -790,29 +828,100 @@ public class Main implements Initializable {
         }
     }
 
-    public void deleteComment() {
+    public void updateForumData() {
+        Forum forum = (Forum) allForumsList.getSelectionModel().getSelectedItem();
+        forumTitle.setText(forum.getForumTitle());
+        forumDescription.setText(forum.getForumDescription());
+        updateCommentButton.setText("Update Forum");
+        updateCommentButton.setVisible(true);
+        updateCommentButton.setOnAction(actionEvent -> updateForum(forum));
     }
 
-    public void updateComment() {
+    private void updateForum(Forum forum) {
+        forum.setForumTitle(forumTitle.getText());
+        forum.setForumDescription(forumDescription.getText());
+        forumHib.updateForum(forum);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Forum Update completed", "", "Forum was successfully updated");
+        updateCommentButton.setVisible(false);
+        fillForumLists();
+        resetForumTab();
+    }
+
+    public void deleteForum() {
+        Forum forum = (Forum) allForumsList.getSelectionModel().getSelectedItem();
+        List<Comment> forumComments = getCommentsByParentId(forum.getId());
+        for (Comment comment : forumComments) {
+            deleteComment(comment);
+        }
+        forumHib.deleteForum(forum);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "Forum was successfully deleted");
+        fillForumLists();
+        loadComments();
+    }
+
+    public void deleteComment() {
+        Comment comment = (Comment) commentTree.getSelectionModel().getSelectedItem().getValue();
+        commentHib.deleteComment(comment);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "Comment was successfully deleted");
+        loadComments();
+    }
+
+    public void deleteComment(Comment comment) {
+        commentHib.deleteComment(comment);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "Comment was successfully deleted");
+    }
+
+    public void updateCommentData() {
+        Comment comment = (Comment) commentTree.getSelectionModel().getSelectedItem().getValue();
+        commentTitle.setText(comment.getTitle());
+        commentText.setText(comment.getCommentText());
+        updateCommentButton.setText("Update Comment");
+        updateCommentButton.setVisible(true);
+        updateCommentButton.setOnAction(actionEvent -> updateComment(comment));
+    }
+
+    public void updateComment(Comment comment) {
+        comment.setTitle(commentTitle.getText());
+        comment.setCommentText(commentText.getText());
+        commentHib.updateComment(comment);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Comment Update completed", "", "Comment was successfully updated");
+        updateCommentButton.setVisible(false);
+        loadComments();
+        resetForumTab();
     }
 
     public void createComment() {
         Forum forum = allForumsList.getSelectionModel().getSelectedItem();
         Comment comment = new Comment(commentTitle.getText(), commentText.getText(), forum);
         commentHib.createComment(comment);
+        loadComments();
     }
 
     public void loadComments() {
-        Forum forum = allForumsList.getSelectionModel().getSelectedItem();
-        List<Comment> comments = forumHib.getForumByID(forum.getId()).getComments();
-        commentTree.setRoot(new TreeItem(new Comment()));
-        commentTree.setShowRoot(false);
-        commentTree.getRoot().setExpanded(true);
-        comments.forEach(comment -> addTreeItem(comment, commentTree.getRoot()));
-//        commentTree.setRoot(new TreeItem<String>("All comments from forum"));
-//        List<Comment> comments = forumHib.getForumByID(forumID);
+        Forum forumFromList = allForumsList.getSelectionModel().getSelectedItem();
+        Forum forum = forumHib.getForumByID(forumFromList.getId());
+        List<Comment> comments = getCommentsByParentId(forum.getId());
+        TreeItem mainRoot = new TreeItem<>("Open Comments");
+        TreeItem<Comment> commentTreeItem = new TreeItem<Comment>();
+        for (Comment comment : comments) {
+            mainRoot.getChildren().add(new TreeItem<>(comment));
+        }
+        commentTree.setRoot(mainRoot);
     }
-    private void addTreeItem(Comment comment, TreeItem parent){
+
+    public List<Comment> getCommentsByParentId(int id) {
+        List<Comment> comments = commentHib.getAllComments();
+        List<Comment> forumComments = new ArrayList<Comment>();
+        for (Comment comment : comments) {
+            ;
+            if (comment.getParentForum().getId() == id) {
+                forumComments.add(comment);
+            }
+        }
+        return forumComments;
+    }
+
+    private void addTreeItem(Comment comment, TreeItem parent) {
         TreeItem<Comment> treeItem = new TreeItem<Comment>(comment);
         parent.getChildren().add(treeItem);
         comment.getReplies().forEach(r -> addTreeItem(r, treeItem));
@@ -820,12 +929,62 @@ public class Main implements Initializable {
 
     public void createForum() {
         Destination destination = (Destination) ordersChoiceBoxForum.getValue();
-        if (fxUtils.areForumFieldsFilled(forumTitle.getId(), forumDescription.getText(),destination))
+        if (fxUtils.areForumFieldsFilled(forumTitle.getId(), forumDescription.getText(), destination))
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Creation Error", "", "All fields must be filled");
-        else{
+        else {
             Forum forum = new Forum(forumTitle.getText(), forumDescription.getText(), destination);
             forumHib.createForum(forum);
             fillForumLists();
         }
+    }
+
+    public void updateOrderData() {
+        orderActionButton.setVisible(true);
+        assignOrderButton.setVisible(false);
+        orderAddress.setVisible(true);
+        orderDeliveryDate.setVisible(true);
+        fillOrderFields();
+    }
+
+    private void fillOrderFields() {
+        Destination destination = allOrdersList.getSelectionModel().getSelectedItem();
+        orderAddress.setText(destination.getAddress());
+        orderDeliveryDate.setValue(destination.getRequestedDeliveryDate());
+        trucksChoiceBoxOrders.setValue(destination.getTruck());
+
+        orderActionButton.setOnAction(actionEvent -> updateOrder(destination));
+    }
+
+    private void updateOrder(Destination destination) {
+        destination.setAddress(orderAddress.getText());
+        destination.setRequestedDeliveryDate(orderDeliveryDate.getValue());
+        destination.setTruck((Truck) trucksChoiceBoxOrders.getSelectionModel().getSelectedItem());
+        destinationHib.updateDestination(destination);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Truck Update completed", "", "Order was successfully updated");
+        fillAllOrders();
+        resetDestinationTab();
+        orderActionButton.setVisible(false);
+        assignOrderButton.setVisible(true);
+    }
+
+    private void fillAllOrders() {
+        allOrdersList.getItems().clear();
+        List<Destination> allDestinations = destinationHib.getAllDestinations();
+        for (Destination destination : allDestinations) {
+            allOrdersList.getItems().add(destination);
+        }
+    }
+
+    private void resetDestinationTab() {
+        orderAddress.setVisible(false);
+        orderDeliveryDate.setVisible(false);
+        orderAddress.setText("");
+        orderDeliveryDate.setValue(null);
+        trucksChoiceBoxOrders.setValue("");
+    }
+
+    public void deleteOrder() {
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Truck Update completed", "", "Order was successfully deleted");
+        fillAllOrders();
     }
 }

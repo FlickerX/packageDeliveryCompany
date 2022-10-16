@@ -37,7 +37,6 @@ public class Forum {
     @Override
     public String toString() {
         return forumTitle +
-                ", " + forumDescription +
-                ", Destination=" + destination;
+                ", " + forumDescription;
     }
 }

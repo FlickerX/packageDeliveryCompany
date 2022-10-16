@@ -40,4 +40,9 @@ public class Comment {
         this.commentText = commentText;
         this.parentComment = parentComment;
     }
+
+    @Override
+    public String toString() {
+        return "Title= " + title + ", Text ='" + commentText;
+    }
 }
