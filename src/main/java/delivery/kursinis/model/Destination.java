@@ -34,7 +34,7 @@ public class Destination {
     private List<Checkpoint> checkpoints;
     @ManyToOne
     private Courier courier;
-    @OneToOne
+    @ManyToOne
     private Truck truck;
 
     @OneToMany (mappedBy = "destination", cascade = CascadeType.ALL)
