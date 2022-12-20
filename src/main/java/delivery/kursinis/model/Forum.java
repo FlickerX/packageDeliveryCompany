@@ -25,13 +25,10 @@ public class Forum {
     @OneToMany (mappedBy = "forum", cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    @ManyToOne
-    private Destination destination;
 
-    public Forum(String forumTitle, String forumDescription, Destination destination) {
+    public Forum(String forumTitle, String forumDescription) {
         this.forumTitle = forumTitle;
         this.forumDescription = forumDescription;
-        this.destination = destination;
     }
 
     @Override

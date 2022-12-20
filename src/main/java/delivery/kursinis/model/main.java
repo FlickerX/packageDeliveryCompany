@@ -14,7 +14,7 @@ public class main {
 
         UserHib userHib = new UserHib(entityManagerFactory);
 
-        Manager manager = new Manager("admin", "admin", "Nikita", "Gorcakovas", LocalDate.of(2001, Month.SEPTEMBER, 14), "+37000000000", 567.00, false);
+        Manager manager = new Manager("admin", "admin", "Nikita", "Gorcakovas", LocalDate.of(2001, Month.SEPTEMBER, 14), "+37000000000", 567.00, true);
         userHib.createUser(manager);
     }
 }

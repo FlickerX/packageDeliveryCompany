@@ -37,8 +37,6 @@ public class Destination {
     @ManyToOne
     private Truck truck;
 
-    @OneToMany (mappedBy = "destination", cascade = CascadeType.ALL)
-    private List<Forum> forums;
     public Destination(String address, LocalDate requestedDeliveryDate, LocalDate deliveryStartDate, OrderStatus status, List<Manager> managers, List<Cargo> cargos, Courier courier, Truck truck) {
         this.address = address;
         this.requestedDeliveryDate = requestedDeliveryDate;
