@@ -593,7 +593,7 @@ public class Main implements Initializable {
 
     public void assignTruckToOrder() {
         Destination destination = (Destination) allOrdersList.getSelectionModel().getSelectedItem();
-        if (couriersChoiceBox.getSelectionModel().getSelectedItem() != null && destination.getTruck() != null) {
+        if (trucksChoiceBoxOrders.getSelectionModel().getSelectedItem() != null && destination.getTruck() == null) {
             destination.setTruck((Truck) trucksChoiceBoxOrders.getValue());
             destinationHib.updateDestination(destination);
             fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Assign Status", "", "Truck was successfully assigned to order");
