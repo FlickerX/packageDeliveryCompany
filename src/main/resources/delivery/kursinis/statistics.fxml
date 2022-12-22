@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="750.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="delivery.kursinis.fxContorllers.Statistics">
+   <children>
+      <BarChart fx:id="checkpointsChart" layoutX="57.0" layoutY="83.0" prefHeight="400.0" prefWidth="1055.0">
+        <xAxis>
+          <CategoryAxis fx:id="checkpointsX" side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="checkpointsY" side="LEFT" />
+        </yAxis>
+      </BarChart>
+      <Text layoutX="524.0" layoutY="61.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Checkpoints">
+         <font>
+            <Font size="28.0" />
+         </font>
+      </Text>
+      <Text layoutX="410.0" layoutY="507.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Total checkpoints:">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Text>
+      <Text fx:id="totalCheckpoints" layoutX="612.0" layoutY="507.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Text>
+   </children>
+</AnchorPane>

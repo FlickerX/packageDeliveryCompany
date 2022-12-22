@@ -327,6 +327,7 @@
                                 <items>
                                     <MenuItem fx:id="updateOrderMenuItem" mnemonicParsing="false" onAction="#updateOrderData" text="Update Order" />
                                     <MenuItem fx:id="deleteOrderMenuItem" mnemonicParsing="false" onAction="#deleteOrder" text="Delete Order" />
+                                    <MenuItem fx:id="statisticsItem" mnemonicParsing="false" onAction="#openStatisticsPage" text="Statistics" />
                                 </items>
                               </ContextMenu>
                            </contextMenu></ListView>

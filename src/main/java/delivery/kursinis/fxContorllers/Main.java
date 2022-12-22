@@ -1,13 +1,23 @@
 package delivery.kursinis.fxContorllers;
 
 import delivery.kursinis.Enums.OrderStatus;
+import delivery.kursinis.HelloApplication;
 import delivery.kursinis.hibernate.*;
 import delivery.kursinis.model.*;
 import delivery.kursinis.utils.FxUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 import javax.persistence.EntityManagerFactory;
 import java.net.URL;
@@ -16,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+
 
 public class Main implements Initializable {
     @FXML
@@ -48,6 +59,14 @@ public class Main implements Initializable {
     public ChoiceBox statusFilter;
     @FXML
     public ChoiceBox courierChoiceBoxOrdersFilter;
+    @FXML
+    public Button filterByDepartureButton;
+    @FXML
+    public Button filterByArrivalButton;
+    @FXML
+    public Button filterByStatusButton;
+    @FXML
+    public Button filterByCourierButton;
     @FXML
     ChoiceBox<String> userTypeChoiceBox;
     @FXML
@@ -236,6 +255,10 @@ public class Main implements Initializable {
     }
 
     private void disableData() {
+        Manager manager = userHib.getManagerByID(user.getId());
+        if (manager != null && !manager.isAdmin()){
+            allTabs.getTabs().remove(registerUserTab);
+        }
         if (user.getClass() == Courier.class) {
             allTabs.getTabs().remove(truckManagementTab);
             allTabs.getTabs().remove(registerUserTab);
@@ -243,7 +266,7 @@ public class Main implements Initializable {
             allTabs.getTabs().remove(cargoManagementTab);
             deleteOrderMenuItem.setVisible(false);
             updateOrderMenuItem.setVisible(false);
-            managerChoiceBoxOrders.setVisible(false); // TODO: Make it when Manager visible
+            managerChoiceBoxOrders.setVisible(false);
             addManagerButton.setVisible(false);
             allOrdersList.setEditable(false);
             courierChoiceBoxOrders.setVisible(false);
@@ -569,7 +592,6 @@ public class Main implements Initializable {
     }
 
     public void assignTruckToOrder() {
-        //TODO: Check if value from choiceBox is selected
         Destination destination = (Destination) allOrdersList.getSelectionModel().getSelectedItem();
         if (couriersChoiceBox.getSelectionModel().getSelectedItem() != null && destination.getTruck() != null) {
             destination.setTruck((Truck) trucksChoiceBoxOrders.getValue());
@@ -584,7 +606,6 @@ public class Main implements Initializable {
         try {
             Checkpoint checkpoint = null;
             int id = ((Destination) assignedOrdersList.getSelectionModel().getSelectedItem()).getId();
-//        int id = ((Destination) allOrdersList.getSelectionModel().getSelectedItem()).getId();
             Destination destination = destinationHib.getDestinationByID(id);
 
             Checkpoint checkpointFromCheckbox = (Checkpoint) checkpointsChoiceBoxOrders.getValue();
@@ -632,6 +653,7 @@ public class Main implements Initializable {
         } else {
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Checkpoint creating warning", "Validation error", "All fields has to be filled");
         }
+        fillAllCheckpoints();
     }
 
     public void deleteCheckpoint() {
@@ -647,6 +669,7 @@ public class Main implements Initializable {
     }
 
     private void fillCheckpointFields() {
+        checkpointsList.getItems().clear();
         Checkpoint checkpoint = checkpointsList.getSelectionModel().getSelectedItem();
         checkpointAddress.setText(checkpoint.getAddress());
         checkpointDateTab.setValue(checkpoint.getCheckpointDate());
@@ -782,6 +805,7 @@ public class Main implements Initializable {
 
     private void fillAllCheckpoints() {
         checkpointsList.getItems().clear();
+        checkpointsChoiceBoxOrders.getItems().clear();
         List<Checkpoint> allCheckpoints = checkpointHib.getAllCheckpoints();
         for (Checkpoint checkpoint : allCheckpoints) {
             checkpointsList.getItems().add(checkpoint);
@@ -1120,6 +1144,7 @@ public class Main implements Initializable {
         }else{
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose departure filter value");
         }
+        removeValuesFromFilter();
     }
 
     public void filterByArrival() {
@@ -1151,6 +1176,7 @@ public class Main implements Initializable {
         }else{
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose arrival filter value");
         }
+        removeValuesFromFilter();
     }
 
     public void filterByStatus() {
@@ -1182,6 +1208,7 @@ public class Main implements Initializable {
         }else{
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose status filter value");
         }
+        removeValuesFromFilter();
     }
 
     public void filterByCourier() {
@@ -1214,9 +1241,33 @@ public class Main implements Initializable {
         }else{
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose courier filter value");
         }
+        removeValuesFromFilter();
     }
 
     public void setDefaultLists() {
         fillAllDestinations();
+        removeValuesFromFilter();
+    }
+
+    private void removeValuesFromFilter(){
+        departureDateFilter.setValue(null);
+        arrivalDateFilter.setValue(null);
+        statusFilter.setValue(null);
+        courierChoiceBoxOrdersFilter.setValue(null);
+    }
+
+    public void openStatisticsPage() {
+        Destination destination = destinationHib.getDestinationByID(allOrdersList.getSelectionModel().getSelectedItem().getId());
+        List<Checkpoint> checkpoints = destination.getCheckpoints();
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("statistics.fxml"));
+            Stage stage = new Stage(StageStyle.DECORATED);
+            stage.setScene(new Scene(fxmlLoader.load()));
+            Statistics controller = fxmlLoader.getController();
+            controller.initData(destination, checkpoints);
+            stage.show();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 }
