@@ -233,6 +233,16 @@ public class Main implements Initializable {
         List<Truck> allTrucks = truckHib.getAllTrucks();
         List<Courier> allCouriers = userHib.getAllCouriers();
         List<Manager> allManagers = userHib.getAllManagers();
+        for ( int i = 0; i < allTrucks.size() - 1; i++ ) {
+            trucksChoiceBoxOrders.getItems().add(allTrucks.get(i));
+            trucksChoiceBox.getItems().add(allTrucks.get(i));
+        }
+
+        for ( int i = 0; i < allCouriers.size() -1; i++ ) {
+            couriersChoiceBox.getItems().add(allCouriers.get(i));
+            courierChoiceBoxOrders.getItems().add(allCouriers.get(i));
+            courierChoiceBoxOrdersFilter.getItems().add(allCouriers.get(i));
+        }
 
 
         for (Manager manager : allManagers)
@@ -400,6 +410,14 @@ public class Main implements Initializable {
         resetUserTab();
     }
 
+    public void remove() {
+        User user1 = courierList.getSelectionModel().getSelectedItem();
+        userHib.removeUser(user1);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "User was successfully deleted");
+        fillManagersLists();
+        fillCourierLists();
+    }
+
     public void createTruck() {
         if (!fxUtils.isPositiveInteger(horsePower.getText()) || !fxUtils.isPositiveDouble(engineLiters.getText()) ||
                 fxUtils.areAllTruckFieldsFilled(mark.getText(), model.getText(), horsePower.getText(), engineLiters.getText(), color.getText())) {
@@ -491,6 +509,35 @@ public class Main implements Initializable {
         cargoHib.removeCargo(cargo);
         fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "Cargo was successfully deleted");
         fillCargosLists();
+    }
+
+    public void createOrder() {
+        Manager CurrentManager = userHib.getManagerByID(user.getId());
+        Truck truck = null;
+        Courier courier = null;
+        List<Manager> selectedManagers = new ArrayList<>();
+        selectedManagers.add(CurrentManager);
+        for (Manager man : managersOrderList.getSelectionModel().getSelectedItems()) {
+            selectedManagers.add(man);
+        }
+        List<Cargo> selectedCargos = cargosOrderList.getSelectionModel().getSelectedItems();
+        Truck truckFromChoiceBox = (Truck) trucksChoiceBox.getValue();
+        Courier courierFromChoiceBox = (Courier) couriersChoiceBox.getValue();
+        if (!fxUtils.areDestinationFieldsFilled(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING) &&
+                fxUtils.isCargoListEmpty(selectedCargos)) {
+            if (truckFromChoiceBox != null)
+                truck = truckHib.getTruckByID(truckFromChoiceBox.getId());
+            if (courierFromChoiceBox != null)
+                courier = userHib.getCourierByID(courierFromChoiceBox.getId());
+
+            Destination destination = new Destination(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING, selectedManagers, selectedCargos, courier, truck);
+            destinationHib.createDestination(destination);
+            allOrdersList.getItems().add(destination);
+            fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Order Creation Status", "", "Order was created");
+            fillAllDestinations();
+        } else {
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Field Input Error", "Typing Error", "All fields has to be filled");
+        }
     }
 
     public void setOrderToCurrentUser() {
