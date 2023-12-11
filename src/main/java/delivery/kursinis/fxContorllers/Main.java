@@ -289,9 +289,6 @@ public class Main implements Initializable {
     }
 
     public class UserCreationController {
-        private UserHib userHib;
-        private FxUtils fxUtils;
-        private ComboBox<String> userTypeChoiceBox;
 
         public UserCreationController() {
         }
