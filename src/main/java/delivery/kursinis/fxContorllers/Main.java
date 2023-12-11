@@ -484,7 +484,7 @@ public class Main implements Initializable {
         Truck truckFromChoiceBox = (Truck) trucksChoiceBox.getValue();
 
 
-        if (!fxUtils.areDestinationFieldsFilled(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING) &&
+        if ( !fxUtils.areDestinationFieldsFilled(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING ) &&
                 fxUtils.isCargoListEmpty(selectedCargos)) {
             if (truckFromChoiceBox != null)
                 truck = truckHib.getTruckByID(truckFromChoiceBox.getId());
@@ -785,7 +785,7 @@ public class Main implements Initializable {
                 managersOrderList.getItems().add(manager);
         }
     }
-
+//
     private void fillCourierLists() {
         courierList.getItems().clear();
         couriersChoiceBox.getItems().clear();

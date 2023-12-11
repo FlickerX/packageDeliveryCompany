@@ -20,7 +20,7 @@ import java.util.List;
 public class Manager extends User{
     private boolean isAdmin;
 
-    @ManyToMany(mappedBy = "managers", cascade = {CascadeType.PERSIST, CascadeType.MERGE}) //TODO: Make it work
+    @ManyToMany(mappedBy = "managers", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Destination> destinations;
 
     public Manager(String login, String password, String name, String surname, LocalDate birthday, String phoneNo, Double salary, boolean isAdmin) {
