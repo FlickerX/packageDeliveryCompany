@@ -30,47 +30,7 @@ public class FxUtils {
     public boolean areAllTruckFieldsFilled(String mark, String model, String horsePower, String engineLiters, String color){ // TODO: Make sure to change String to integerts and double
         return mark.isEmpty() || model.isEmpty() || horsePower.isEmpty() || engineLiters.isEmpty() || color.isEmpty();
     }
-    public boolean areCheckpointFieldInputed(String checkpoint, LocalDate checkpointDate){ // TODO: Make sure to change String to integerts and double
-        return checkpoint.isEmpty() || checkpointDate == null;
-    }
-    public boolean areCargoFieldsFilled(String cargoNaming, String weight){
-        return cargoNaming.isEmpty() || weight.isEmpty();
-    }
-    public boolean areDestinationFieldsFilled(String address, LocalDate requestedDeliveryDate, LocalDate currentDay, OrderStatus status){
-        return address.isEmpty() || requestedDeliveryDate == null || currentDay == null || status == null;
-    }
-    public boolean areForumFieldsFilled(String title, String description){
-        return title.isEmpty() || description == null || description == null;
-    }
-    public boolean isPositiveInteger(String text){
-        int number;
-        try{
-            number = Integer.parseInt(text);
-            if (number < 0){
-                alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field can't be negative");
-                return false;
-            }
-        } catch (NumberFormatException e){
-            alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field is not Integer type");
-            return false;
-        }
-        return true;
-    }
-    public boolean isPositiveDouble(String text){
-        double number;
-        try{
-            number = Double.parseDouble(text);
-            if (number < 0){
-                alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field can't be negative");
-                return false;
-            }
 
-        } catch (NumberFormatException e){
-            alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field is not Double type");
-            return false;
-        }
-        return true;
-    }
     public boolean isCargoListEmpty(List<Cargo> cargos){
         return cargos.size() == 0 ? false : true;
     }

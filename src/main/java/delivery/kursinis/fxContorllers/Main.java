@@ -105,19 +105,6 @@ public class Main implements Initializable {
     public ListView<Truck> truckList;
     @FXML
     public Tab orderManagementTab;
-    //Cargos
-    @FXML
-    public Tab cargoManagementTab;
-    @FXML
-    public TextField cargoNaming;
-    @FXML
-    public TextField cargoWeight;
-    @FXML
-    public ListView<Cargo> cargoList;
-    @FXML
-    public Button cargoActionButton;
-    @FXML
-    CargoHib cargoHib;
     @FXML
     public ListView<Manager> managersOrderList;
     @FXML
@@ -208,13 +195,11 @@ public class Main implements Initializable {
     private CommentHib commentHib;
     private ForumHib forumHib;
     private CheckpointHib checkpointHib;
-    private String[] checkBoxValues = {"Courier", "Manager", "Admin Manager"};
     private FxUtils fxUtils = new FxUtils();
 
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        userTypeChoiceBox.getItems().addAll(checkBoxValues);
         userTypeChoiceBox.setOnAction(actionEvent -> hideFields(userTypeChoiceBox.getValue()));
         statusFilter.getItems().addAll(OrderStatus.getStatuses());
     }
@@ -287,54 +272,6 @@ public class Main implements Initializable {
         fillAllCheckpoints();
         fillForumLists();
         setSelectionModes();
-    }
-
-    public void createUserByAdmin() {
-        if (userTypeChoiceBox.getValue() == null)
-            fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "You have to specify user type!");
-        else
-            switch (userTypeChoiceBox.getValue()) {
-                case "Courier":
-                    Courier courier = null;
-                    if (fxUtils.areAllCourierFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(), phoneNumber.getText(), salary.getText(),
-                            driverLicense.getText(), medicalCertificate.getText(), birthday.getValue())) {
-                        fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "All fields has to be filled");
-                        break;
-                    } else if (!fxUtils.isPositiveDouble(salary.getText())) {
-                        fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "Wrong type, type has to be double");
-                        break;
-                    } else {
-                        courier = new Courier(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(), phoneNumber.getText(),
-                                Double.parseDouble(salary.getText()),
-                                driverLicense.getText(), medicalCertificate.getText());
-                        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Courier Creation Status", "", "Courier was created");
-                    }
-                    userHib.createUser(courier);
-                    fillCourierLists();
-                    break;
-
-                case "Manager":
-                case "Admin Manager":
-                    Manager manager = null;
-                    if (fxUtils.areAllManagerFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(), phoneNumber.getText(), salary.getText(),
-                            birthday.getValue())) {
-                        fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "All fields has to be filled");
-                        break;
-                    } else if (!fxUtils.isPositiveDouble(salary.getText())) {
-                        fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "Wrong type, type has to be double");
-                        break;
-                    } else if (userTypeChoiceBox.getValue().equals("Manager")) {
-                        manager = new Manager(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
-                                phoneNumber.getText(), Double.parseDouble(salary.getText()), false);
-                    } else {
-                        manager = new Manager(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
-                                phoneNumber.getText(), Double.parseDouble(salary.getText()), true);
-                        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Manager Creation Status", "", "Manager was created");
-                    }
-                    userHib.createUser(manager);
-                    fillManagersLists();
-                    break;
-            }
     }
 
     public void updateUserData() {

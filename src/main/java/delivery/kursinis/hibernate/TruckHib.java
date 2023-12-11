@@ -1,9 +1,6 @@
 package delivery.kursinis.hibernate;
 
-import delivery.kursinis.model.Courier;
-import delivery.kursinis.model.Destination;
 import delivery.kursinis.model.Truck;
-import delivery.kursinis.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
