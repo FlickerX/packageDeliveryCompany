@@ -40,18 +40,18 @@ public class FxUtils {
         return address.isEmpty() || requestedDeliveryDate == null || currentDay == null || status == null;
     }
     public boolean areForumFieldsFilled(String title, String description){
-        return title.isEmpty() || description == null || description == null;
+        return title.isEmpty() || description == null;
     }
     public boolean isPositiveInteger(String text){
         int number;
         try{
             number = Integer.parseInt(text);
             if (number < 0){
-                alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field can't be negative");
+                alertMessage(Alert.AlertType.ERROR, Constants.FIELD_TYPE_WARNING, Constants.TYPE_ERROR, "Field can't be negative");
                 return false;
             }
         } catch (NumberFormatException e){
-            alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field is not Integer type");
+            alertMessage(Alert.AlertType.ERROR, Constants.FIELD_TYPE_WARNING, Constants.TYPE_ERROR, "Field is not Integer type");
             return false;
         }
         return true;
@@ -61,12 +61,12 @@ public class FxUtils {
         try{
             number = Double.parseDouble(text);
             if (number < 0){
-                alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field can't be negative");
+                alertMessage(Alert.AlertType.ERROR, Constants.FIELD_TYPE_WARNING, Constants.TYPE_ERROR, "Field can't be negative");
                 return false;
             }
 
         } catch (NumberFormatException e){
-            alertMessage(Alert.AlertType.ERROR, "Field Type Warning", "Type Error", "Field is not Double type");
+            alertMessage(Alert.AlertType.ERROR, Constants.FIELD_TYPE_WARNING, Constants.TYPE_ERROR, "Field is not Double type");
             return false;
         }
         return true;
