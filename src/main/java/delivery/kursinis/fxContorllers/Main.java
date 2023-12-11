@@ -233,8 +233,16 @@ public class Main implements Initializable {
         List<Truck> allTrucks = truckHib.getAllTrucks();
         List<Courier> allCouriers = userHib.getAllCouriers();
         List<Manager> allManagers = userHib.getAllManagers();
+        allTrucks.stream().forEach(x -> {
+            trucksChoiceBoxOrders.getItems().add(x);
+            trucksChoiceBox.getItems().add(x);
+        });
 
-
+        allCouriers.stream().forEach(x -> {
+            couriersChoiceBox.getItems().add(x);
+            courierChoiceBoxOrders.getItems().add(x);
+            courierChoiceBoxOrdersFilter.getItems().add(x);
+        });
         for (Manager manager : allManagers)
             managerChoiceBoxOrders.getItems().add(manager);
 
@@ -400,6 +408,14 @@ public class Main implements Initializable {
         resetUserTab();
     }
 
+    public void removeUser() {
+        User user1 = courierList.getSelectionModel().getSelectedItem();
+        userHib.removeUser(user1);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "User was successfully deleted");
+        fillManagersLists();
+        fillCourierLists();
+    }
+
     public void createTruck() {
         if (!fxUtils.isPositiveInteger(horsePower.getText()) || !fxUtils.isPositiveDouble(engineLiters.getText()) ||
                 fxUtils.areAllTruckFieldsFilled(mark.getText(), model.getText(), horsePower.getText(), engineLiters.getText(), color.getText())) {
@@ -491,6 +507,54 @@ public class Main implements Initializable {
         cargoHib.removeCargo(cargo);
         fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Delete completed", "", "Cargo was successfully deleted");
         fillCargosLists();
+    }
+
+    public void createOrder() {
+        if (!validateOrderInputs()) {
+            fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.FIELD_INPUT_ERROR, Constants.TYPE_ERROR, Constants.ALL_FIELDS_REQUIRED);
+            return;
+        }
+
+        Manager currentManager = userHib.getManagerByID(user.getId());
+        List<Manager> selectedManagers = getSelectedManagers(currentManager);
+        List<Cargo> selectedCargos = cargosOrderList.getSelectionModel().getSelectedItems();
+        Truck truck = getSelectedTruck();
+        Courier courier = getSelectedCourier();
+
+        Destination destination = createDestinationObject(selectedManagers, selectedCargos, truck, courier);
+        destinationHib.createDestination(destination);
+
+        updateAllOrdersList(destination);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, Constants.ORDER_CREATING_STATUS, "", Constants.ORDER_CREATED);
+        fillAllDestinations();
+    }
+
+    private boolean validateOrderInputs() {
+        return !fxUtils.areDestinationFieldsFilled(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING)
+                && !fxUtils.isCargoListEmpty(cargosOrderList.getSelectionModel().getSelectedItems());
+    }
+
+    private List<Manager> getSelectedManagers(Manager currentManager) {
+        List<Manager> selectedManagers = new ArrayList<>();
+        selectedManagers.add(currentManager);
+        selectedManagers.addAll(managersOrderList.getSelectionModel().getSelectedItems());
+        return selectedManagers;
+    }
+
+    private Truck getSelectedTruck() {
+        return (trucksChoiceBox.getValue() != null) ? truckHib.getTruckByID(((Truck) trucksChoiceBox.getValue()).getId()) : null;
+    }
+
+    private Courier getSelectedCourier() {
+        return (couriersChoiceBox.getValue() != null) ? userHib.getCourierByID(((Courier) couriersChoiceBox.getValue()).getId()) : null;
+    }
+
+    private Destination createDestinationObject(List<Manager> selectedManagers, List<Cargo> selectedCargos, Truck truck, Courier courier) {
+        return new Destination(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING, selectedManagers, selectedCargos, courier, truck);
+    }
+
+    private void updateAllOrdersList(Destination destination) {
+        allOrdersList.getItems().add(destination);
     }
 
     public void setOrderToCurrentUser() {

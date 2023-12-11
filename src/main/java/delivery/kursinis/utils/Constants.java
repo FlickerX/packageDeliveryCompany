@@ -8,4 +8,8 @@ public class Constants {
     public static final String VALIDATION_ERROR = "Validation error";
     public static final String FIELD_TYPE_WARNING = "Field Type Warning";
     public static final String TYPE_ERROR = "Type Error";
+    public static final String FIELD_INPUT_ERROR = "Field Input Error";
+    public static final String ORDER_CREATING_STATUS = "Order Creating Status";
+    public static final String ORDER_CREATED = "Order Created";
+    public static final String ALL_FIELDS_REQUIRED = "All fields has to be filled";
 }
