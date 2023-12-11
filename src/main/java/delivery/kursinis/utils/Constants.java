@@ -12,4 +12,7 @@ public class Constants {
     public static final String ORDER_CREATING_STATUS = "Order Creating Status";
     public static final String ORDER_CREATED = "Order Created";
     public static final String ALL_FIELDS_REQUIRED = "All fields has to be filled";
+    public static final String USER_NOT_NULL = "User type must not be null";
+    public static final String USER_SPECIFIED = "You have to specify user type!";
+    public static final String CHOOSE_STATUS = "Please choose status filter value";
 }

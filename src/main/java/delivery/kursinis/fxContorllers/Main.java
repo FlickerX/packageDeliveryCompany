@@ -23,10 +23,7 @@ import org.hibernate.SessionFactory;
 import javax.persistence.EntityManagerFactory;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 
 public class Main implements Initializable {
@@ -286,55 +283,116 @@ public class Main implements Initializable {
         setSelectionModes();
     }
 
-    public void createUserByAdmin() {
-        if (userTypeChoiceBox.getValue() == null)
-            fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.USER_CREATION_WARNING, Constants.VALIDATION_ERROR, "You have to specify user type!");
-        else
-            switch (userTypeChoiceBox.getValue()) {
-                case "Courier":
-                    Courier courier = null;
-                    if (fxUtils.areAllCourierFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(), phoneNumber.getText(), salary.getText(),
-                            driverLicense.getText(), medicalCertificate.getText(), birthday.getValue())) {
-                        fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.USER_CREATION_WARNING, Constants.VALIDATION_ERROR, "All fields has to be filled");
-                        break;
-                    } else if (!fxUtils.isPositiveDouble(salary.getText())) {
-                        fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.USER_CREATION_WARNING, Constants.VALIDATION_ERROR, "Wrong type, type has to be double");
-                        break;
-                    } else {
-                        courier = new Courier(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(), phoneNumber.getText(),
-                                Double.parseDouble(salary.getText()),
-                                driverLicense.getText(), medicalCertificate.getText());
-                        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Courier Creation Status", "", "Courier was created");
-                    }
-                    userHib.createUser(courier);
-                    fillCourierLists();
-                    break;
-
-                case "Manager":
-                case "Admin Manager":
-                    Manager manager = null;
-                    if (fxUtils.areAllManagerFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(), phoneNumber.getText(), salary.getText(),
-                            birthday.getValue())) {
-                        fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.USER_CREATION_WARNING, Constants.VALIDATION_ERROR, "All fields has to be filled");
-                        break;
-                    } else if (!fxUtils.isPositiveDouble(salary.getText())) {
-                        fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.USER_CREATION_WARNING, Constants.VALIDATION_ERROR, "Wrong type, type has to be double");
-                        break;
-                    } else if (userTypeChoiceBox.getValue().equals("Manager")) {
-                        manager = new Manager(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
-                                phoneNumber.getText(), Double.parseDouble(salary.getText()), false);
-                    } else {
-                        manager = new Manager(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
-                                phoneNumber.getText(), Double.parseDouble(salary.getText()), true);
-                        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Manager Creation Status", "", "Manager was created");
-                    }
-                    userHib.createUser(manager);
-                    fillManagersLists();
-                    break;
-                default:
-                    break;
-            }
+    public void createUserByAdmin(ActionEvent actionEvent) {
+        UserCreationController controller = new UserCreationController();
+        controller.createUserByAdmin();
     }
+
+    public class UserCreationController {
+
+        public UserCreationController() {
+        }
+
+        public void createUserByAdmin() {
+            if (isUserTypeNotSpecified()) {
+                showUserTypeNotSpecifiedError();
+            } else {
+                switch (userTypeChoiceBox.getValue()) {
+                    case Constants.COURIER:
+                        createCourier();
+                        break;
+
+                    case Constants.MANAGER:
+                    case Constants.ADMIN_MANAGER:
+                        createManager();
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private boolean isUserTypeNotSpecified() {
+            return Objects.requireNonNull(userTypeChoiceBox.getValue(), Constants.USER_NOT_NULL).isBlank();
+        }
+
+        private void showUserTypeNotSpecifiedError() {
+            fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.USER_CREATION_WARNING, Constants.VALIDATION_ERROR, Constants.USER_SPECIFIED);
+        }
+
+        private void createCourier() {
+            if (validateCourierFields()) {
+                return;
+            }
+
+            Courier courier = createCourierInstance();
+
+            fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Courier Creation Status", "", "Courier was created");
+
+            userHib.createUser(courier);
+            fillCourierLists();
+        }
+
+        private boolean validateCourierFields() {
+            if (fxUtils.areAllCourierFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(),
+                    phoneNumber.getText(), salary.getText(), driverLicense.getText(), medicalCertificate.getText(),
+                    birthday.getValue())) {
+                fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.USER_CREATION_WARNING, Constants.VALIDATION_ERROR, "All fields have to be filled");
+                return true;
+            }
+
+            if (!fxUtils.isPositiveDouble(salary.getText())) {
+                fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.USER_CREATION_WARNING, Constants.VALIDATION_ERROR, "Wrong type, type has to be double");
+                return true;
+            }
+
+            return false;
+        }
+
+        private Courier createCourierInstance() {
+            return new Courier(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
+                    phoneNumber.getText(), Double.parseDouble(salary.getText()), driverLicense.getText(), medicalCertificate.getText());
+        }
+
+        private void createManager() {
+            if (validateManagerFields()) {
+                return;
+            }
+
+            Manager manager = createManagerInstance();
+
+            userHib.createUser(manager);
+            fillManagersLists();
+
+            if (userTypeChoiceBox.getValue().equals("Admin Manager")) {
+                fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Manager Creation Status", "", "Manager was created");
+            }
+        }
+
+        private boolean validateManagerFields() {
+            if (fxUtils.areAllManagerFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(),
+                    phoneNumber.getText(), salary.getText(), birthday.getValue())) {
+                fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.USER_CREATION_WARNING, Constants.VALIDATION_ERROR, "All fields have to be filled");
+                return true;
+            }
+
+            if (!fxUtils.isPositiveDouble(salary.getText())) {
+                fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.USER_CREATION_WARNING, Constants.VALIDATION_ERROR, "Wrong type, type has to be double");
+                return true;
+            }
+
+            return false;
+        }
+
+        private Manager createManagerInstance() {
+            boolean isAdminManager = userTypeChoiceBox.getValue().equals("Admin Manager");
+            return new Manager(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
+                    phoneNumber.getText(), Double.parseDouble(salary.getText()), isAdminManager);
+        }
+
+    }
+
 
     public void updateUserData() {
         accountActionButton.setText("Update User");
@@ -1240,35 +1298,59 @@ public class Main implements Initializable {
 //    }
 
     public void filterByStatus() {
-        if (statusFilter.getValue() != null) {
-            allOrdersList.getItems().clear();
+        if (isValidStatusFilter()) {
+            clearLists();
             List<Destination> allDestinations = destinationHib.getAllDestinations();
-            for (Destination destination : allDestinations) {
-                if (destination.getStatus().equals(statusFilter.getValue())) {
-                    allOrdersList.getItems().add(destination);
-                }
-            }
-            assignedOrdersList.getItems().clear();
-            if (user.getClass() == Manager.class) {
-                List<Manager> managers = null;
-                for (Destination destination : allDestinations) {
-                    managers = userHib.getAllManagers();
-                    for (Manager man : managers) {
-                        if (man.getId() == user.getId() && destination.getStatus().equals(statusFilter.getValue())) {
-                            assignedOrdersList.getItems().add(destination);
-                        }
-                    }
-                }
-            } else {
-                for (Destination destination : allDestinations) {
-                    if (destination.getCourier() != null && destination.getCourier().getId() == user.getId() && destination.getStatus().equals(statusFilter.getValue()))
-                        assignedOrdersList.getItems().add(destination);
-                }
-            }
-        }else{
-            fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose status filter value");
+            filterAndPopulateLists(allDestinations);
+        } else {
+            showStatusFilterError();
         }
         removeValuesFromFilter();
+    }
+
+    private boolean isValidStatusFilter() {
+        return statusFilter.getValue() != null;
+    }
+
+    private void clearLists() {
+        allOrdersList.getItems().clear();
+        assignedOrdersList.getItems().clear();
+    }
+
+    private void filterAndPopulateLists(List<Destination> allDestinations) {
+        for (Destination destination : allDestinations) {
+            if (destination.getStatus().equals(statusFilter.getValue())) {
+                allOrdersList.getItems().add(destination);
+                populateAssignedOrdersList(destination);
+            }
+        }
+    }
+
+    private void populateAssignedOrdersList(Destination destination) {
+        if (user.getClass() == Manager.class) {
+            populateAssignedOrdersForManager(destination);
+        } else {
+            populateAssignedOrdersForCourier(destination);
+        }
+    }
+
+    private void populateAssignedOrdersForManager(Destination destination) {
+        List<Manager> managers = userHib.getAllManagers();
+        for (Manager manager : managers) {
+            if (manager.getId() == user.getId() && destination.getStatus().equals(statusFilter.getValue())) {
+                assignedOrdersList.getItems().add(destination);
+            }
+        }
+    }
+
+    private void populateAssignedOrdersForCourier(Destination destination) {
+        if (destination.getCourier() != null && destination.getCourier().getId() == user.getId()) {
+            assignedOrdersList.getItems().add(destination);
+        }
+    }
+
+    private void showStatusFilterError() {
+        fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.TYPE_ERROR, "", Constants.CHOOSE_STATUS);
     }
 
 
