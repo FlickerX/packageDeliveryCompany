@@ -1227,33 +1227,75 @@ public class Main implements Initializable {
         if (arrivalDateFilter.getValue() != null) {
             allOrdersList.getItems().clear();
             List<Destination> allDestinations = destinationHib.getAllDestinations();
-            for (Destination destination : allDestinations) {
-                if (destination.getDeliveryStartDate().isEqual(arrivalDateFilter.getValue())) {
-                    allOrdersList.getItems().add(destination);
-                }
-            }
-            assignedOrdersList.getItems().clear();
-            if (user.getClass() == Manager.class) {
-                List<Manager> managers = null;
-                for (Destination destination : allDestinations) {
-                    managers = userHib.getAllManagers();
-                    for (Manager man : managers) {
-                        if (man.getId() == user.getId() && destination.getDeliveryStartDate().isEqual(arrivalDateFilter.getValue())) {
-                            assignedOrdersList.getItems().add(destination);
-                        }
-                    }
-                }
-            } else {
-                for (Destination destination : allDestinations) {
-                    if (destination.getCourier() != null && destination.getCourier().getId() == user.getId() && destination.getDeliveryStartDate().isEqual(arrivalDateFilter.getValue()))
-                        assignedOrdersList.getItems().add(destination);
-                }
-            }
-        }else{
+
+            filterByArrivalDate(allDestinations, arrivalDateFilter.getValue());
+        } else {
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose arrival filter value");
         }
+
         removeValuesFromFilter();
     }
+
+    private void filterByArrivalDate(List<Destination> destinations, LocalDate arrivalDate) {
+        for (Destination destination : destinations) {
+            if (destination.getDeliveryStartDate().isEqual(arrivalDate)) {
+                allOrdersList.getItems().add(destination);
+                if (user.getClass() == Manager.class) {
+                    filterManagerDestinations(destination, arrivalDate);
+                } else {
+                    filterCourierDestinations(destination, arrivalDate);
+                }
+            }
+        }
+    }
+
+    private void filterManagerDestinations(Destination destination, LocalDate arrivalDate) {
+        List<Manager> managers = userHib.getAllManagers();
+        for (Manager man : managers) {
+            if (man.getId() == user.getId() && destination.getDeliveryStartDate().isEqual(arrivalDate)) {
+                assignedOrdersList.getItems().add(destination);
+            }
+        }
+    }
+
+    private void filterCourierDestinations(Destination destination, LocalDate arrivalDate) {
+        if (destination.getCourier() != null && destination.getCourier().getId() == user.getId() && destination.getDeliveryStartDate().isEqual(arrivalDate)) {
+            assignedOrdersList.getItems().add(destination);
+        }
+    }
+
+//    public void filterByArrival() {
+//        if (arrivalDateFilter.getValue() != null) {
+//            allOrdersList.getItems().clear();
+//            List<Destination> allDestinations = destinationHib.getAllDestinations();
+//            for (Destination destination : allDestinations) {
+//                if (destination.getDeliveryStartDate().isEqual(arrivalDateFilter.getValue())) {
+//                    allOrdersList.getItems().add(destination);
+//                }
+//            }
+//            assignedOrdersList.getItems().clear();
+//            if (user.getClass() == Manager.class) {
+//                List<Manager> managers = null;
+//                for (Destination destination : allDestinations) {
+//                    managers = userHib.getAllManagers();
+//                    for (Manager man : managers) {
+//                        if (man.getId() == user.getId() && destination.getDeliveryStartDate().isEqual(arrivalDateFilter.getValue())) {
+//                            assignedOrdersList.getItems().add(destination);
+//                        }
+//                    }
+//                }
+//            } else {
+//                for (Destination destination : allDestinations) {
+//                    if (destination.getCourier() != null && destination.getCourier().getId() == user.getId()
+//                            && destination.getDeliveryStartDate().isEqual(arrivalDateFilter.getValue()))
+//                        assignedOrdersList.getItems().add(destination);
+//                }
+//            }
+//        }else{
+//            fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose arrival filter value");
+//        }
+//        removeValuesFromFilter();
+//    }
 
     public void filterByStatus() {
         if (isValidStatusFilter()) {
@@ -1311,38 +1353,97 @@ public class Main implements Initializable {
         fxUtils.alertMessage(Alert.AlertType.ERROR, Constants.TYPE_ERROR, "", Constants.CHOOSE_STATUS);
     }
 
+
     public void filterByCourier() {
         if (courierChoiceBoxOrdersFilter.getSelectionModel().getSelectedItem() != null) {
             Courier courier = (Courier) courierChoiceBoxOrdersFilter.getSelectionModel().getSelectedItem();
-            allOrdersList.getItems().clear();
+
+            clearAllLists();
+
             List<Destination> allDestinations = destinationHib.getAllDestinations();
-            for (Destination destination : allDestinations) {
-                if (destination.getCourier() != null && destination.getCourier().getId() == courier.getId()) {
-                    allOrdersList.getItems().add(destination);
-                }
-            }
-            assignedOrdersList.getItems().clear();
-            if (user.getClass() == Manager.class) {
-                List<Manager> managers = null;
-                for (Destination destination : allDestinations) {
-                    managers = userHib.getAllManagers();
-                    for (Manager man : managers) {
-                        if (destination.getCourier() != null && man.getId() == user.getId() && destination.getCourier().getId() == courier.getId()) {
-                            assignedOrdersList.getItems().add(destination);
-                        }
-                    }
-                }
-            } else {
-                for (Destination destination : allDestinations) {
-                    if (destination.getCourier() != null && destination.getCourier().getId() == user.getId() && destination.getCourier().getId() == courier.getId())
-                        assignedOrdersList.getItems().add(destination);
-                }
-            }
-        }else{
+
+            filterAllOrdersListByCourier(allDestinations, courier);
+
+            filterAssignedOrdersList(allDestinations, courier);
+
+        } else {
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose courier filter value");
         }
+
         removeValuesFromFilter();
     }
+
+    private void clearAllLists() {
+        allOrdersList.getItems().clear();
+        assignedOrdersList.getItems().clear();
+    }
+
+    private void filterAllOrdersListByCourier(List<Destination> allDestinations, Courier courier) {
+        for (Destination destination : allDestinations) {
+            if (destination.getCourier() != null && destination.getCourier().getId() == courier.getId()) {
+                allOrdersList.getItems().add(destination);
+            }
+        }
+    }
+
+    private void filterAssignedOrdersList(List<Destination> allDestinations, Courier courier) {
+        if (user.getClass() == Manager.class) {
+            List<Manager> managers = userHib.getAllManagers();
+            for (Destination destination : allDestinations) {
+                filterManagerAssignedOrdersList(managers, destination, courier);
+            }
+        } else {
+            for (Destination destination : allDestinations) {
+                filterCourierAssignedOrdersList(destination, courier);
+            }
+        }
+    }
+
+    private void filterManagerAssignedOrdersList(List<Manager> managers, Destination destination, Courier courier) {
+        for (Manager man : managers) {
+            if (destination.getCourier() != null && man.getId() == user.getId() && destination.getCourier().getId() == courier.getId()) {
+                assignedOrdersList.getItems().add(destination);
+            }
+        }
+    }
+
+    private void filterCourierAssignedOrdersList(Destination destination, Courier courier) {
+        if (destination.getCourier() != null && destination.getCourier().getId() == user.getId() && destination.getCourier().getId() == courier.getId()) {
+            assignedOrdersList.getItems().add(destination);
+        }
+    }
+//    public void filterByCourier() {
+//        if (courierChoiceBoxOrdersFilter.getSelectionModel().getSelectedItem() != null) {
+//            Courier courier = (Courier) courierChoiceBoxOrdersFilter.getSelectionModel().getSelectedItem();
+//            allOrdersList.getItems().clear();
+//            List<Destination> allDestinations = destinationHib.getAllDestinations();
+//            for (Destination destination : allDestinations) {
+//                if (destination.getCourier() != null && destination.getCourier().getId() == courier.getId()) {
+//                    allOrdersList.getItems().add(destination);
+//                }
+//            }
+//            assignedOrdersList.getItems().clear();
+//            if (user.getClass() == Manager.class) {
+//                List<Manager> managers = null;
+//                for (Destination destination : allDestinations) {
+//                    managers = userHib.getAllManagers();
+//                    for (Manager man : managers) {
+//                        if (destination.getCourier() != null && man.getId() == user.getId() && destination.getCourier().getId() == courier.getId()) {
+//                            assignedOrdersList.getItems().add(destination);
+//                        }
+//                    }
+//                }
+//            } else {
+//                for (Destination destination : allDestinations) {
+//                    if (destination.getCourier() != null && destination.getCourier().getId() == user.getId() && destination.getCourier().getId() == courier.getId())
+//                        assignedOrdersList.getItems().add(destination);
+//                }
+//            }
+//        }else{
+//            fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose courier filter value");
+//        }
+//        removeValuesFromFilter();
+//    }
 
     public void setDefaultLists() {
         fillAllDestinations();
