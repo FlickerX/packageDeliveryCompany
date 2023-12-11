@@ -1,20 +1,32 @@
 package delivery.kursinis.fxContorllers;
 
 import delivery.kursinis.Enums.OrderStatus;
+import delivery.kursinis.HelloApplication;
 import delivery.kursinis.hibernate.*;
 import delivery.kursinis.model.*;
 import delivery.kursinis.utils.FxUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 import javax.persistence.EntityManagerFactory;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+
 
 public class Main implements Initializable {
     @FXML
@@ -31,6 +43,30 @@ public class Main implements Initializable {
     public TextField commentTitle;
     @FXML
     public TextField commentText;
+    @FXML
+    public Button addManagerButton;
+    @FXML
+    public ChoiceBox courierChoiceBoxOrders;
+    @FXML
+    public Button addCourierButton;
+    @FXML
+    public MenuItem replyItemInForum;
+    @FXML
+    public DatePicker departureDateFilter;
+    @FXML
+    public DatePicker arrivalDateFilter;
+    @FXML
+    public ChoiceBox statusFilter;
+    @FXML
+    public ChoiceBox courierChoiceBoxOrdersFilter;
+    @FXML
+    public Button filterByDepartureButton;
+    @FXML
+    public Button filterByArrivalButton;
+    @FXML
+    public Button filterByStatusButton;
+    @FXML
+    public Button filterByCourierButton;
     @FXML
     ChoiceBox<String> userTypeChoiceBox;
     @FXML
@@ -157,8 +193,6 @@ public class Main implements Initializable {
     @FXML
     public TextField forumDescription;
     @FXML
-    public ChoiceBox ordersChoiceBoxForum;
-    @FXML
     public Button forumActionButton;
     @FXML
     public ListView<Forum> allForumsList;
@@ -182,6 +216,7 @@ public class Main implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         userTypeChoiceBox.getItems().addAll(checkBoxValues);
         userTypeChoiceBox.setOnAction(actionEvent -> hideFields(userTypeChoiceBox.getValue()));
+        statusFilter.getItems().addAll(OrderStatus.getStatuses());
     }
 
     public void setData(EntityManagerFactory entityManagerFactory, User user) {
@@ -204,8 +239,12 @@ public class Main implements Initializable {
             trucksChoiceBox.getItems().add(truck);
         }
 
-        for (Courier courier : allCouriers)
+        for (Courier courier : allCouriers) {
             couriersChoiceBox.getItems().add(courier);
+            courierChoiceBoxOrders.getItems().add(courier);
+            courierChoiceBoxOrdersFilter.getItems().add(courier);
+        }
+
 
         for (Manager manager : allManagers)
             managerChoiceBoxOrders.getItems().add(manager);
@@ -216,6 +255,10 @@ public class Main implements Initializable {
     }
 
     private void disableData() {
+        Manager manager = userHib.getManagerByID(user.getId());
+        if (manager != null && !manager.isAdmin()){
+            allTabs.getTabs().remove(registerUserTab);
+        }
         if (user.getClass() == Courier.class) {
             allTabs.getTabs().remove(truckManagementTab);
             allTabs.getTabs().remove(registerUserTab);
@@ -223,6 +266,11 @@ public class Main implements Initializable {
             allTabs.getTabs().remove(cargoManagementTab);
             deleteOrderMenuItem.setVisible(false);
             updateOrderMenuItem.setVisible(false);
+            managerChoiceBoxOrders.setVisible(false);
+            addManagerButton.setVisible(false);
+            allOrdersList.setEditable(false);
+            courierChoiceBoxOrders.setVisible(false);
+            addCourierButton.setVisible(false);
         }
         orderActionButton.setVisible(false);
         updateCommentButton.setVisible(false);
@@ -249,19 +297,13 @@ public class Main implements Initializable {
                 case "Courier":
                     Courier courier = null;
                     if (fxUtils.areAllCourierFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(), phoneNumber.getText(), salary.getText(),
-                            driverLicense.getText(), medicalCertificate.getText(), birthday.getValue())){
+                            driverLicense.getText(), medicalCertificate.getText(), birthday.getValue())) {
                         fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "All fields has to be filled");
                         break;
-                    }
-
-
-                    else if (!fxUtils.isPositiveDouble(salary.getText())){
+                    } else if (!fxUtils.isPositiveDouble(salary.getText())) {
                         fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "Wrong type, type has to be double");
                         break;
-                    }
-
-
-                    else {
+                    } else {
                         courier = new Courier(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(), phoneNumber.getText(),
                                 Double.parseDouble(salary.getText()),
                                 driverLicense.getText(), medicalCertificate.getText());
@@ -275,19 +317,13 @@ public class Main implements Initializable {
                 case "Admin Manager":
                     Manager manager = null;
                     if (fxUtils.areAllManagerFieldsFilled(username.getText(), password.getText(), name.getText(), surname.getText(), phoneNumber.getText(), salary.getText(),
-                            birthday.getValue())){
+                            birthday.getValue())) {
                         fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "All fields has to be filled");
                         break;
-                    }
-
-
-                    else if (!fxUtils.isPositiveDouble(salary.getText())){
+                    } else if (!fxUtils.isPositiveDouble(salary.getText())) {
                         fxUtils.alertMessage(Alert.AlertType.ERROR, "User creating warning", "Validation error", "Wrong type, type has to be double");
                         break;
-                    }
-
-
-                    else if (userTypeChoiceBox.getValue().equals("Manager")) {
+                    } else if (userTypeChoiceBox.getValue().equals("Manager")) {
                         manager = new Manager(username.getText(), password.getText(), name.getText(), surname.getText(), birthday.getValue(),
                                 phoneNumber.getText(), Double.parseDouble(salary.getText()), false);
                     } else {
@@ -383,10 +419,9 @@ public class Main implements Initializable {
 
     public void createTruck() {
         if (!fxUtils.isPositiveInteger(horsePower.getText()) || !fxUtils.isPositiveDouble(engineLiters.getText()) ||
-                fxUtils.areAllTruckFieldsFilled(mark.getText(), model.getText(), horsePower.getText(), engineLiters.getText(), color.getText())){
+                fxUtils.areAllTruckFieldsFilled(mark.getText(), model.getText(), horsePower.getText(), engineLiters.getText(), color.getText())) {
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Truck creating warning", "Validation error", "All fields has to be filled");
-        }
-        else{
+        } else {
             Truck truck = new Truck(mark.getText(), model.getText(), Double.parseDouble(engineLiters.getText()), Integer.parseInt(horsePower.getText()),
                     color.getText());
             truckHib.createTruck(truck);
@@ -478,18 +513,23 @@ public class Main implements Initializable {
     public void createOrder() {
         Manager currentManager = userHib.getManagerByID(user.getId());
         Truck truck = null;
-        managersOrderList.getItems().add(currentManager);
-        List<Manager> selectedManagers = managersOrderList.getSelectionModel().getSelectedItems();
+        Courier courier = null;
+        List<Manager> selectedManagers = new ArrayList<>();
+        selectedManagers.add(currentManager);
+        for (Manager man : managersOrderList.getSelectionModel().getSelectedItems()) {
+            selectedManagers.add(man);
+        }
         List<Cargo> selectedCargos = cargosOrderList.getSelectionModel().getSelectedItems();
         Truck truckFromChoiceBox = (Truck) trucksChoiceBox.getValue();
-
-
-        if ( !fxUtils.areDestinationFieldsFilled(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING ) &&
+        Courier courierFromChoiceBox = (Courier) couriersChoiceBox.getValue();
+        if (!fxUtils.areDestinationFieldsFilled(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING) &&
                 fxUtils.isCargoListEmpty(selectedCargos)) {
             if (truckFromChoiceBox != null)
                 truck = truckHib.getTruckByID(truckFromChoiceBox.getId());
+            if (courierFromChoiceBox != null)
+                courier = userHib.getCourierByID(courierFromChoiceBox.getId());
 
-            Destination destination = new Destination(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING, selectedManagers, selectedCargos, truck);
+            Destination destination = new Destination(destinationAddress.getText(), destinationRequestedDeliveryDate.getValue(), LocalDate.now(), OrderStatus.PENDING, selectedManagers, selectedCargos, courier, truck);
             destinationHib.createDestination(destination);
             allOrdersList.getItems().add(destination);
             fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Order Creation Status", "", "Order was created");
@@ -509,6 +549,7 @@ public class Main implements Initializable {
             Courier courier = userHib.getCourierByID(user.getId());
             destination.setCourier(courier);
             destinationHib.updateDestination(destination);
+            fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Updated", "", "You assigned yourself to order");
         } else {
             Manager manager = userHib.getManagerByID(user.getId());
             List<Manager> destinationManagers = destination.getManagers();
@@ -532,31 +573,50 @@ public class Main implements Initializable {
     private void fillAssignedOrders() {
         assignedOrdersList.getItems().clear();
         List<Destination> allDestinations = destinationHib.getAllDestinations();
-        for (Destination destination : allDestinations) {
-            if (destination.getCourier().getId() == user.getId())
-                assignedOrdersList.getItems().add(destination);
+        if (user.getClass() == Manager.class) {
+            List<Manager> managers = null;
+            for (Destination destination : allDestinations) {
+                managers = userHib.getAllManagers();
+                for (Manager man : managers) {
+                    if (man.getId() == user.getId()) {
+                        assignedOrdersList.getItems().add(destination);
+                    }
+                }
+            }
+        } else {
+            for (Destination destination : allDestinations) {
+                if (destination.getCourier() != null && destination.getCourier().getId() == user.getId())
+                    assignedOrdersList.getItems().add(destination);
+            }
         }
     }
 
     public void assignTruckToOrder() {
-        //TODO: Check if value from choiceBox is selected
         Destination destination = (Destination) allOrdersList.getSelectionModel().getSelectedItem();
-        destination.setTruck((Truck) trucksChoiceBoxOrders.getValue());
-        destinationHib.updateDestination(destination);
-        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Assign Status", "", "Truck was successfully assigned to order");
+        if (trucksChoiceBoxOrders.getSelectionModel().getSelectedItem() != null && destination.getTruck() == null) {
+            destination.setTruck((Truck) trucksChoiceBoxOrders.getValue());
+            destinationHib.updateDestination(destination);
+            fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Assign Status", "", "Truck was successfully assigned to order");
+        } else {
+            fxUtils.alertMessage(Alert.AlertType.WARNING, "Assign Status", "", "Truck was already assigned by manager");
+        }
     }
 
     public void addCheckpointToOrder() {
-        Checkpoint checkpoint = null;
-        int id = ((Destination) allOrdersList.getSelectionModel().getSelectedItem()).getId();
-        Destination destination = destinationHib.getDestinationByID(id);
+        try {
+            Checkpoint checkpoint = null;
+            int id = ((Destination) assignedOrdersList.getSelectionModel().getSelectedItem()).getId();
+            Destination destination = destinationHib.getDestinationByID(id);
 
-        Checkpoint checkpointFromCheckbox = (Checkpoint) checkpointsChoiceBoxOrders.getValue();
-        checkpoint = checkpointHib.getCheckpointByID(checkpointFromCheckbox.getId());
+            Checkpoint checkpointFromCheckbox = (Checkpoint) checkpointsChoiceBoxOrders.getValue();
+            checkpoint = checkpointHib.getCheckpointByID(checkpointFromCheckbox.getId());
 
-        destination.getCheckpoints().add(checkpoint);
-        destinationHib.updateDestination(destination);
-        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Assign Status", "", "Checkpoint was successfully added to order");
+            destination.getCheckpoints().add(checkpoint);
+            destinationHib.updateDestination(destination);
+            fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Assign Status", "", "Checkpoint was successfully added to order");
+        } catch (Exception e) {
+            fxUtils.alertMessage(Alert.AlertType.WARNING, "WRONG", "", "You can't edit not assigned orders");
+        }
     }
 
     public void assignManagerToOrder() {
@@ -593,6 +653,7 @@ public class Main implements Initializable {
         } else {
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Checkpoint creating warning", "Validation error", "All fields has to be filled");
         }
+        fillAllCheckpoints();
     }
 
     public void deleteCheckpoint() {
@@ -608,6 +669,7 @@ public class Main implements Initializable {
     }
 
     private void fillCheckpointFields() {
+        checkpointsList.getItems().clear();
         Checkpoint checkpoint = checkpointsList.getSelectionModel().getSelectedItem();
         checkpointAddress.setText(checkpoint.getAddress());
         checkpointDateTab.setValue(checkpoint.getCheckpointDate());
@@ -743,6 +805,7 @@ public class Main implements Initializable {
 
     private void fillAllCheckpoints() {
         checkpointsList.getItems().clear();
+        checkpointsChoiceBoxOrders.getItems().clear();
         List<Checkpoint> allCheckpoints = checkpointHib.getAllCheckpoints();
         for (Checkpoint checkpoint : allCheckpoints) {
             checkpointsList.getItems().add(checkpoint);
@@ -753,16 +816,11 @@ public class Main implements Initializable {
 
     private void fillAllDestinations() {
         allOrdersList.getItems().clear();
-        assignedOrdersList.getItems().clear();
-        ordersChoiceBoxForum.getItems().clear();
         List<Destination> allDestinations = destinationHib.getAllDestinations();
         for (Destination destination : allDestinations) {
             allOrdersList.getItems().add(destination);
-            ordersChoiceBoxForum.getItems().add(destination);
-            if (destination.getCourier() != null && destination.getCourier().getId() == user.getId()) {
-                assignedOrdersList.getItems().add(destination);
-            }
         }
+        fillAssignedOrders();
     }
 
     private void fillCargosLists() {
@@ -904,7 +962,18 @@ public class Main implements Initializable {
         TreeItem mainRoot = new TreeItem<>("Open Comments");
         TreeItem<Comment> commentTreeItem = new TreeItem<Comment>();
         for (Comment comment : comments) {
-            mainRoot.getChildren().add(new TreeItem<>(comment));
+            if (comment.getParentForum() != null) {
+                mainRoot.getChildren().add(new TreeItem<>(comment));
+            }
+        }
+        List<Comment> allComments = commentHib.getAllComments();
+        for (Comment comment : allComments) {
+            if (comment.getParentComment() != null) {
+                Comment parentComment = commentHib.getCommentByID(comment.getParentComment().getId());
+                TreeItem<Comment> tree = new TreeItem<>(parentComment);
+                tree.getChildren().add(new TreeItem<>(comment));
+                mainRoot.getChildren().add(tree);
+            }
         }
         commentTree.setRoot(mainRoot);
     }
@@ -913,8 +982,7 @@ public class Main implements Initializable {
         List<Comment> comments = commentHib.getAllComments();
         List<Comment> forumComments = new ArrayList<Comment>();
         for (Comment comment : comments) {
-            ;
-            if (comment.getParentForum().getId() == id) {
+            if (comment.getParentForum() != null && comment.getParentForum().getId() == id) {
                 forumComments.add(comment);
             }
         }
@@ -928,11 +996,10 @@ public class Main implements Initializable {
     }
 
     public void createForum() {
-        Destination destination = (Destination) ordersChoiceBoxForum.getValue();
-        if (fxUtils.areForumFieldsFilled(forumTitle.getId(), forumDescription.getText(), destination))
+        if (fxUtils.areForumFieldsFilled(forumTitle.getId(), forumDescription.getText()))
             fxUtils.alertMessage(Alert.AlertType.ERROR, "Creation Error", "", "All fields must be filled");
         else {
-            Forum forum = new Forum(forumTitle.getText(), forumDescription.getText(), destination);
+            Forum forum = new Forum(forumTitle.getText(), forumDescription.getText());
             forumHib.createForum(forum);
             fillForumLists();
         }
@@ -984,7 +1051,223 @@ public class Main implements Initializable {
     }
 
     public void deleteOrder() {
-        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Truck Update completed", "", "Order was successfully deleted");
+        Destination destination = (Destination) allOrdersList.getSelectionModel().getSelectedItem();
+        destinationHib.removeDestination(destination);
+        fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Truck Delete completed", "", "Order was successfully deleted");
         fillAllOrders();
+    }
+
+    public void assignCourierToOrder() {
+        int id = ((Destination) allOrdersList.getSelectionModel().getSelectedItem()).getId();
+        if (allOrdersList.getSelectionModel().getSelectedItem().getCourier() == null) {
+            Destination destination = destinationHib.getDestinationByID(id);
+            Courier courierFromChoiceBox = (Courier) courierChoiceBoxOrders.getValue();
+            Courier courier = userHib.getCourierByID(courierFromChoiceBox.getId());
+            destination.setCourier(courier);
+            destinationHib.updateDestination(destination);
+            fxUtils.alertMessage(Alert.AlertType.INFORMATION, "Courier Assigned Successfully", "", "Courier was successfully assigned to order");
+        } else {
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Assign Error", "", "There's already assigned Courier to order");
+        }
+    }
+
+    public void replyCommentData() {
+        TreeItem<Comment> parentCommentTree = commentTree.getSelectionModel().getSelectedItem();
+        Comment parentComment = commentHib.getCommentByID(commentTree.getSelectionModel().getSelectedItem().getValue().getId());
+        Comment comment = new Comment(commentTitle.getText(), commentText.getText(), parentComment);
+        commentHib.createComment(comment);
+        parentCommentTree.getChildren().add(new TreeItem<>(comment));
+    }
+
+    public void setNextOrderStatus() {
+        Destination destination = assignedOrdersList.getSelectionModel().getSelectedItem();
+        switch (destination.getStatus()) {
+            case PENDING:
+                destination.setStatus(OrderStatus.IN_PROGRESS);
+                break;
+            case IN_PROGRESS:
+                destination.setStatus(OrderStatus.COMPLETED);
+                destination.setDeliveryEndDate(LocalDate.now());
+                break;
+        }
+        destinationHib.updateDestination(destination);
+        fillAllDestinations();
+    }
+
+    public void setPreviousOrderStatus() {
+        Destination destination = assignedOrdersList.getSelectionModel().getSelectedItem();
+        switch (destination.getStatus()) {
+            case IN_PROGRESS:
+                destination.setStatus(OrderStatus.PENDING);
+                break;
+            case COMPLETED:
+                destination.setStatus(OrderStatus.IN_PROGRESS);
+                break;
+        }
+        destinationHib.updateDestination(destination);
+        fillAllDestinations();
+    }
+
+    public void cancelOrder() {
+        Destination destination = assignedOrdersList.getSelectionModel().getSelectedItem();
+        destination.setStatus(OrderStatus.CANCELED);
+        destinationHib.updateDestination(destination);
+        fillAllDestinations();
+    }
+
+    public void filterByDeparture() {
+        if (departureDateFilter.getValue() != null) {
+            allOrdersList.getItems().clear();
+            List<Destination> allDestinations = destinationHib.getAllDestinations();
+            for (Destination destination : allDestinations) {
+                if (destination.getDeliveryStartDate().isEqual(departureDateFilter.getValue())) {
+                    allOrdersList.getItems().add(destination);
+                }
+            }
+            assignedOrdersList.getItems().clear();
+            if (user.getClass() == Manager.class) {
+                List<Manager> managers = null;
+                for (Destination destination : allDestinations) {
+                    managers = userHib.getAllManagers();
+                    for (Manager man : managers) {
+                        if (man.getId() == user.getId() && destination.getDeliveryStartDate().isEqual(departureDateFilter.getValue())) {
+                            assignedOrdersList.getItems().add(destination);
+                        }
+                    }
+                }
+            } else {
+                for (Destination destination : allDestinations) {
+                    if (destination.getCourier() != null && destination.getCourier().getId() == user.getId() && destination.getDeliveryStartDate().isEqual(departureDateFilter.getValue()))
+                        assignedOrdersList.getItems().add(destination);
+                }
+            }
+        }else{
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose departure filter value");
+        }
+        removeValuesFromFilter();
+    }
+
+    public void filterByArrival() {
+        if (arrivalDateFilter.getValue() != null) {
+            allOrdersList.getItems().clear();
+            List<Destination> allDestinations = destinationHib.getAllDestinations();
+            for (Destination destination : allDestinations) {
+                if (destination.getDeliveryStartDate().isEqual(arrivalDateFilter.getValue())) {
+                    allOrdersList.getItems().add(destination);
+                }
+            }
+            assignedOrdersList.getItems().clear();
+            if (user.getClass() == Manager.class) {
+                List<Manager> managers = null;
+                for (Destination destination : allDestinations) {
+                    managers = userHib.getAllManagers();
+                    for (Manager man : managers) {
+                        if (man.getId() == user.getId() && destination.getDeliveryStartDate().isEqual(arrivalDateFilter.getValue())) {
+                            assignedOrdersList.getItems().add(destination);
+                        }
+                    }
+                }
+            } else {
+                for (Destination destination : allDestinations) {
+                    if (destination.getCourier() != null && destination.getCourier().getId() == user.getId() && destination.getDeliveryStartDate().isEqual(arrivalDateFilter.getValue()))
+                        assignedOrdersList.getItems().add(destination);
+                }
+            }
+        }else{
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose arrival filter value");
+        }
+        removeValuesFromFilter();
+    }
+
+    public void filterByStatus() {
+        if (statusFilter.getValue() != null) {
+            allOrdersList.getItems().clear();
+            List<Destination> allDestinations = destinationHib.getAllDestinations();
+            for (Destination destination : allDestinations) {
+                if (destination.getStatus().equals(statusFilter.getValue())) {
+                    allOrdersList.getItems().add(destination);
+                }
+            }
+            assignedOrdersList.getItems().clear();
+            if (user.getClass() == Manager.class) {
+                List<Manager> managers = null;
+                for (Destination destination : allDestinations) {
+                    managers = userHib.getAllManagers();
+                    for (Manager man : managers) {
+                        if (man.getId() == user.getId() && destination.getStatus().equals(statusFilter.getValue())) {
+                            assignedOrdersList.getItems().add(destination);
+                        }
+                    }
+                }
+            } else {
+                for (Destination destination : allDestinations) {
+                    if (destination.getCourier() != null && destination.getCourier().getId() == user.getId() && destination.getStatus().equals(statusFilter.getValue()))
+                        assignedOrdersList.getItems().add(destination);
+                }
+            }
+        }else{
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose status filter value");
+        }
+        removeValuesFromFilter();
+    }
+
+    public void filterByCourier() {
+        if (courierChoiceBoxOrdersFilter.getSelectionModel().getSelectedItem() != null) {
+            Courier courier = (Courier) courierChoiceBoxOrdersFilter.getSelectionModel().getSelectedItem();
+            allOrdersList.getItems().clear();
+            List<Destination> allDestinations = destinationHib.getAllDestinations();
+            for (Destination destination : allDestinations) {
+                if (destination.getCourier() != null && destination.getCourier().getId() == courier.getId()) {
+                    allOrdersList.getItems().add(destination);
+                }
+            }
+            assignedOrdersList.getItems().clear();
+            if (user.getClass() == Manager.class) {
+                List<Manager> managers = null;
+                for (Destination destination : allDestinations) {
+                    managers = userHib.getAllManagers();
+                    for (Manager man : managers) {
+                        if (destination.getCourier() != null && man.getId() == user.getId() && destination.getCourier().getId() == courier.getId()) {
+                            assignedOrdersList.getItems().add(destination);
+                        }
+                    }
+                }
+            } else {
+                for (Destination destination : allDestinations) {
+                    if (destination.getCourier() != null && destination.getCourier().getId() == user.getId() && destination.getCourier().getId() == courier.getId())
+                        assignedOrdersList.getItems().add(destination);
+                }
+            }
+        }else{
+            fxUtils.alertMessage(Alert.AlertType.ERROR, "Error", "", "Please choose courier filter value");
+        }
+        removeValuesFromFilter();
+    }
+
+    public void setDefaultLists() {
+        fillAllDestinations();
+        removeValuesFromFilter();
+    }
+
+    private void removeValuesFromFilter(){
+        departureDateFilter.setValue(null);
+        arrivalDateFilter.setValue(null);
+        statusFilter.setValue(null);
+        courierChoiceBoxOrdersFilter.setValue(null);
+    }
+
+    public void openStatisticsPage() {
+        Destination destination = destinationHib.getDestinationByID(allOrdersList.getSelectionModel().getSelectedItem().getId());
+        List<Checkpoint> checkpoints = destination.getCheckpoints();
+        try{
+            FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("statistics.fxml"));
+            Stage stage = new Stage(StageStyle.DECORATED);
+            stage.setScene(new Scene(fxmlLoader.load()));
+            Statistics controller = fxmlLoader.getController();
+            controller.initData(destination, checkpoints);
+            stage.show();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 }

@@ -9,6 +9,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Getter
@@ -34,11 +35,9 @@ public class Destination {
     private List<Checkpoint> checkpoints;
     @ManyToOne
     private Courier courier;
-    @OneToOne
+    @ManyToOne
     private Truck truck;
 
-    @OneToMany (mappedBy = "destination", cascade = CascadeType.ALL)
-    private List<Forum> forums;
     public Destination(String address, LocalDate requestedDeliveryDate, LocalDate deliveryStartDate, OrderStatus status, List<Manager> managers, List<Cargo> cargos, Courier courier, Truck truck) {
         this.address = address;
         this.requestedDeliveryDate = requestedDeliveryDate;

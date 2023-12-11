@@ -39,7 +39,7 @@ public class FxUtils {
     public boolean areDestinationFieldsFilled(String address, LocalDate requestedDeliveryDate, LocalDate currentDay, OrderStatus status){
         return address.isEmpty() || requestedDeliveryDate == null || currentDay == null || status == null;
     }
-    public boolean areForumFieldsFilled(String title, String description, Destination destination){
+    public boolean areForumFieldsFilled(String title, String description){
         return title.isEmpty() || description == null || description == null;
     }
     public boolean isPositiveInteger(String text){

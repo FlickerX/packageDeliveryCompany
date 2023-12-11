@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,8 +24,8 @@ public class Truck {
     private Integer horsePower;
     private String color;
     private Boolean isAvailable;
-    @OneToOne
-    private Destination destination;
+    @OneToMany(mappedBy = "truck")
+    private List<Destination> destinations;
 
     public Truck(String mark, String model, Double engineLiters, Integer horsePower, String color) {
         this.mark = mark;
